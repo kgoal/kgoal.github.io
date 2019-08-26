@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="学习笔记,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Acitivity 的启动模式在了解启动模式前，先明白 Task 和回退栈的概念  每启动一个 Activity 都会被放入回退栈中，并且遵循先进后出的规则。而一个 Task 对应一个回退栈（可以理解为同一个东西）。按照默认的情况，一个 app 应用会对应着一个 Task，也就是一个回退栈。  启动模式改变的就是 Activity 放入回退栈的这一过程，其中可以通过以下方法来改变默认的情况  修改">
+<meta name="keywords" content="学习笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Activity LaunchMode">
+<meta property="og:url" content="http://yoursite.com/2019/08/26/LaunchMode/index.html">
+<meta property="og:site_name" content="Koga">
+<meta property="og:description" content="Acitivity 的启动模式在了解启动模式前，先明白 Task 和回退栈的概念  每启动一个 Activity 都会被放入回退栈中，并且遵循先进后出的规则。而一个 Task 对应一个回退栈（可以理解为同一个东西）。按照默认的情况，一个 app 应用会对应着一个 Task，也就是一个回退栈。  启动模式改变的就是 Activity 放入回退栈的这一过程，其中可以通过以下方法来改变默认的情况  修改">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://i.imgur.com/5tQc5JH.jpg">
+<meta property="og:image" content="https://i.imgur.com/Ejaz856.jpg">
+<meta property="og:image" content="https://i.imgur.com/6khLz8x.jpg">
+<meta property="og:image" content="https://i.imgur.com/nsxhlNo.jpg">
+<meta property="og:image" content="https://i.imgur.com/kp7gCV0.jpg">
+<meta property="og:image" content="https://i.imgur.com/T0ZjgWr.jpg">
+<meta property="og:image" content="https://i.imgur.com/HE5UYqK.jpg">
+<meta property="og:image" content="https://i.imgur.com/uT7xnwS.jpg">
+<meta property="og:updated_time" content="2019-08-26T14:56:56.802Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Activity LaunchMode">
+<meta name="twitter:description" content="Acitivity 的启动模式在了解启动模式前，先明白 Task 和回退栈的概念  每启动一个 Activity 都会被放入回退栈中，并且遵循先进后出的规则。而一个 Task 对应一个回退栈（可以理解为同一个东西）。按照默认的情况，一个 app 应用会对应着一个 Task，也就是一个回退栈。  启动模式改变的就是 Activity 放入回退栈的这一过程，其中可以通过以下方法来改变默认的情况  修改">
+<meta name="twitter:image" content="https://i.imgur.com/5tQc5JH.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/08/26/LaunchMode/">
+
+
+
+
+
+  <title>Activity LaunchMode | Koga</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Koga</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/08/26/LaunchMode/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Koga Leung">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Koga">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Activity LaunchMode</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-08-26T22:05:00+08:00">
+                2019-08-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Acitivity-的启动模式"><a href="#Acitivity-的启动模式" class="headerlink" title="Acitivity 的启动模式"></a>Acitivity 的启动模式</h1><p>在了解启动模式前，先明白 Task 和回退栈的概念</p>
+<blockquote>
+<p>每启动一个 Activity 都会被放入回退栈中，并且遵循先进后出的规则。而一个 Task 对应一个回退栈（可以理解为同一个东西）。按照默认的情况，一个 app 应用会对应着一个 Task，也就是一个回退栈。</p>
+</blockquote>
+<p>启动模式改变的就是 Activity 放入回退栈的这一过程，其中可以通过以下方法来改变默认的情况</p>
+<ol>
+<li>修改 Manifest 文件中 Activity 的属性<ul>
+<li>taskAffinity</li>
+<li>launchMode</li>
+<li>allowTaskParenting</li>
+<li>clearTaskOnlaunch</li>
+<li>alwaysRetainTaskState</li>
+<li>finishOnTaskLaunch</li>
+</ul>
+</li>
+</ol>
+<ol start="2">
+<li>修改 Intent 中的 Flag 值<ul>
+<li>FLAG_ACTIVITY_NEW_TASK</li>
+<li>FLAG_ACTIVITY_CLEAR_TOP</li>
+<li>FLAG_ACTIVITY_SINGLE_TOP</li>
+</ul>
+</li>
+</ol>
+<blockquote>
+<p>可以通过修改 Manifest 文件来修改启动模式或者是 Intent 来更改，其中 Intent 中的更改优先级更高。</p>
+</blockquote>
+<h2 id="launchMode"><a href="#launchMode" class="headerlink" title="launchMode"></a>launchMode</h2><p>通过修改 launchMode 来决定 Activity 的启动模式，有以下 4 个选择</p>
+<ul>
+<li>standard （默认）</li>
+<li>singleTop</li>
+<li>singleTask</li>
+<li>singleInstance</li>
+</ul>
+<h3 id="singleTop"><a href="#singleTop" class="headerlink" title="singleTop"></a>singleTop</h3><p>singltTop 启动模式下， 假若 Activity 处于<strong>当前 Task 栈</strong>的顶端，则系统不会新建一个 Activity 而通过 <code>onNewIntent</code> 方法对其复用。</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// TestMainActivity 文件</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TestMainActivity</span> : <span class="type">AppCompatActivity</span></span>() &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onCreate</span><span class="params">(savedInstanceState: <span class="type">Bundle</span>?)</span></span> &#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState)</span><br><span class="line">        setContentView(R.layout.activity_test_main)</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 跳转当前 Activity</span></span><br><span class="line">        jump_btn.setOnClickListener &#123;</span><br><span class="line">            startActivity(intentFor&lt;TestMainActivity&gt;(<span class="string">"number"</span> to  <span class="string">"1"</span>))</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 日志记录</span></span><br><span class="line">        logInfo(<span class="string">"taskId is <span class="variable">$taskId</span>"</span>)</span><br><span class="line">        logInfo(<span class="string">"onCreate"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    ... <span class="comment">// 每一个生命周期方法都有如上的日志记录，省略不写</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onNewIntent</span><span class="params">(intent: <span class="type">Intent</span>?)</span></span> &#123;</span><br><span class="line">        <span class="keyword">super</span>.onNewIntent(intent)</span><br><span class="line">        logInfo(<span class="string">"onNewIntent"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">logInfo</span><span class="params">(msg:<span class="type">String</span>)</span></span>&#123;</span><br><span class="line">        Log.i(LOG_TAG,msg)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">companion</span> <span class="keyword">object</span>&#123;</span><br><span class="line">        <span class="keyword">const</span> <span class="keyword">val</span> LOG_TAG = <span class="string">"Main Activity"</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!--&lt;/AndroidManifest 文件&gt;--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">".task.TestMainActivity"</span></span></span><br><span class="line"><span class="tag">  <span class="attr">android:launchMode</span>=<span class="string">"singleTop"</span></span></span><br><span class="line"><span class="tag">&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">activity</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>执行操作: 多次点击页面的按钮，跳转 TestMainActivity 页面。</li>
+<li>输出日志: </li>
+</ul>
+<p><img src="https://i.imgur.com/5tQc5JH.jpg" alt="Imgur"></p>
+<p>根据日志可以看出，当前 Activity 所处的任务栈 id 为 189，并且整个日志输出中，只执行了一次 <code>onCreate</code>，这说明每次点击按钮后，系统都是复用顶层的 Activity。</p>
+<p>通过 <code>onNewIntent</code> 方法来进行复用，并且在<strong>这种情况下</strong>，复用后直接执行的是 <code>onResume</code> 方法。</p>
+<ul>
+<li>返回键</li>
+</ul>
+<p>此时按下返回键，会回到 <code>TestMainActivity</code> 的上一层 Activity</p>
+<h3 id="singleTask"><a href="#singleTask" class="headerlink" title="singleTask"></a>singleTask</h3><p>顾名思义，这种模式下，保证了 Activity 在 Task 栈中只有一个实例。</p>
+<p>在跳转至该 Activity 时：</p>
+<ol>
+<li>先判断其<strong>对应的 Task 栈</strong>是否存在，如果不存在，则新建 Task 栈并新增该 Activity；</li>
+<li>如果 Task 中已经存在，并且 Activity 在栈中已经存在一个实例，则会通过 <code>onNewIntent</code> 来直接复用，并且会销毁在其之上的 Activity；</li>
+<li>如果 Task 中如果不存在该 Activity 实例，则会新建一个 Activity。</li>
+</ol>
+<blockquote>
+<p>上面有提到对应的 Task 栈，这是指的 <code>Androidmanafest</code> 文件中的 <code>taskAffinity</code> 属性，通过该属性来设置 Activity 所对应的 Task 栈，默认为包名所对应的栈。</p>
+</blockquote>
+<p>先来测试下不设置 taskAffinity 属性的情况</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">FirstActivity</span> : <span class="type">AppCompatActivity</span></span>() &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onCreate</span><span class="params">(savedInstanceState: <span class="type">Bundle</span>?)</span></span> &#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState)</span><br><span class="line">        setContentView(R.layout.activity_first)</span><br><span class="line">        back_btn.setOnClickListener &#123;</span><br><span class="line">            <span class="comment">// 跳转回去 TestMainActivity</span></span><br><span class="line">            <span class="comment">// 引入了 Anko 库</span></span><br><span class="line">            startActivity(intentFor&lt;TestMainActivity&gt;(<span class="string">"number"</span> to <span class="string">"3"</span>))</span><br><span class="line">        &#125;</span><br><span class="line">        logInfo(<span class="string">"taskId is <span class="variable">$taskId</span>"</span>)</span><br><span class="line">        logInfo(<span class="string">"onCreate"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    ... 其余的和上面例子一致</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>除此之外，还需要把 <code>TestMainActivity</code> 中按钮跳转的页面修改为 <code>FirstActivity</code>，还要 xml 文件也需要修改。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">".task.FirstActivity"</span></span></span><br><span class="line"><span class="tag">  <span class="attr">android:launchMode</span>=<span class="string">"singleTask"</span></span></span><br><span class="line"><span class="tag">&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">activity</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">".task.TestMainActivity"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">activity</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>执行操作: 点击按钮，从 TestMainActivity -&gt; FirstActivity -&gt; TestMainActivity -&gt; FirstActivity。</li>
+<li>输出日志: </li>
+</ul>
+<p><img src="https://i.imgur.com/Ejaz856.jpg" alt="Imgur"></p>
+<ol>
+<li>从 taskId 可以看出，两个 Activity 都处于同一个栈中。</li>
+<li>第一次进入 FirstActivity 时，则是走正常的生命周期创建，而在第二次进入 FirstActivity 时，则是通过 <code>onNewIntent</code> 进入的，并且是从 <code>onRestart</code> 开始执行。</li>
+<li>第二次创建的 TestMainActivity 在进入 FirstActivity 时，被销毁了。这表明在复用时，会销毁其上面的 Activity。</li>
+</ol>
+<ul>
+<li>返回键:</li>
+</ul>
+<p>按下返回键，第一次回到 TestMainActivity，第二次回到 TestMainActivity 的上一层 Activity。</p>
+<p>如果修改了 <code>taskAffinity</code> 属性，不使用默认的栈。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">".task.FirstActivity"</span></span></span><br><span class="line"><span class="tag">  <span class="attr">android:launchMode</span>=<span class="string">"singleTask"</span></span></span><br><span class="line"><span class="tag">  <span class="attr">android:taskAffinity</span>=<span class="string">"com.koga.android_learning.test10"</span></span></span><br><span class="line"><span class="tag">&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">activity</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">".task.TestMainActivity"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">activity</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>其余代码保持不变</p>
+<ul>
+<li>执行操作: 点击按钮，从 TestMainActivity -&gt; FirstActivity -&gt; TestMainActivity -&gt; FirstActivity。</li>
+<li>输出日志: </li>
+</ul>
+<p><img src="https://i.imgur.com/6khLz8x.jpg" alt="Imgur"></p>
+<ol>
+<li>从 taskId 可以看出，两个 Activity 都处于不同的栈中，这表明设置 <code>taskAffinity</code> 的属性确实有影响。</li>
+<li>第一次进入 FirstActivity 时，则是走正常的生命周期创建，而在第二次进入 FirstActivity 时，则是通过 <code>onNewIntent</code> 进入的，并且是从 <code>onRestart</code> 开始执行。</li>
+</ol>
+<ul>
+<li>返回键:</li>
+</ul>
+<p>按下返回键，第一次回到 TestMainActivity，第二次回到 TestMainActivity 的上一层 Activity。</p>
+<blockquote>
+<p>即使在新的栈中创建 Activity，也能够返回到另一个栈中的 Activity。</p>
+</blockquote>
+<h3 id="singleInstance"><a href="#singleInstance" class="headerlink" title="singleInstance"></a>singleInstance</h3><p>这个启动模式下的 Activity 在所有任务栈中只存在一个实例。是因为这个 Activity 在创建时，会单独创建一个 Task 栈来存放，并且该任务栈不能够再存放其他的 Activity。也就是说，这个任务栈只存放一个 Activity。</p>
+<blockquote>
+<p>该模式不受 <code>taskAffinity</code> 影响</p>
+</blockquote>
+<p>Androidmanafest 文件修改如下，其余代码不变</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">".task.FirstActivity"</span></span></span><br><span class="line"><span class="tag">  <span class="attr">android:launchMode</span>=<span class="string">"singleInstance"</span></span></span><br><span class="line"><span class="tag">&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">activity</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">".task.TestMainActivity"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">activity</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>执行操作: 点击按钮，从 TestMainActivity -&gt; FirstActivity -&gt; TestMainActivity -&gt; FirstActivity。</li>
+<li>输出日志: </li>
+</ul>
+<p><img src="https://i.imgur.com/nsxhlNo.jpg" alt="Imgur"></p>
+<ol>
+<li>从 taskId 可以看出，TestMainActivity 都是在 195 任务栈，FirstActivity 都是在 196 任务栈。这表明从 FirstActivity 启动的 TestMainActivity 不会在 196 中创建，而是根据其 <code>taskAffinity</code> 来决定（没有设置就是默认）</li>
+<li>在第二次进入 FirstActivity 时，不会再销毁 TestMainActivity 了。</li>
+</ol>
+<ul>
+<li>返回键:</li>
+</ul>
+<p>按下返回键，第一次回到 TestMainActivity，第二次也回到了 TestMainActivity，第三次回到 TestMainActivity 的上一层 Activity。</p>
+<p>这是因为 TestMainActivity 创建了两次，并且都没被销毁，如果想要实现只出现一次 TestMainActivity 的话，只需要在 xml 文件中，为 TestMainActivity 添加 singleTop 启动模式即可。</p>
+<h3 id="onNewIntent"><a href="#onNewIntent" class="headerlink" title="onNewIntent"></a>onNewIntent</h3><p>这个方法有两个细节：</p>
+<ol>
+<li>在执行该方法后，有可能执行 <code>onRestart</code>，也有可能执行 <code>onResume</code> 方法，这取决于该 Activity 当前的状态（按照上述日志得出的结果）</li>
+<li>在调用 onNewIntent 复用 Activity 时，如果不设置新的 intent，则会使用旧的。</li>
+</ol>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onNewIntent</span><span class="params">(intent: <span class="type">Intent</span>?)</span></span> &#123;</span><br><span class="line">    <span class="keyword">super</span>.onNewIntent(intent)</span><br><span class="line">    intent?.putExtra(<span class="string">"number"</span>,<span class="string">"2"</span>)</span><br><span class="line">    <span class="comment">// 通过 setIntent 来传入新的 intent</span></span><br><span class="line">    setIntent(intent)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>根据这两个细节，所以也应该考虑对 intent 数据的操作是放在那个生命周期中执行。</p>
+<h2 id="Intent-Flag"><a href="#Intent-Flag" class="headerlink" title="Intent Flag"></a>Intent Flag</h2><h3 id="FLAG-ACTIVITY-SINGLE-TOP"><a href="#FLAG-ACTIVITY-SINGLE-TOP" class="headerlink" title="FLAG_ACTIVITY_SINGLE_TOP"></a>FLAG_ACTIVITY_SINGLE_TOP</h3><p>按照官方文档说法，该 Flag 和 singleTop 的效果一致,代码实现如下</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">".task.TestMainActivity"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">activity</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onCreate</span><span class="params">(savedInstanceState: <span class="type">Bundle</span>?)</span></span> &#123;</span><br><span class="line">    <span class="keyword">super</span>.onCreate(savedInstanceState)</span><br><span class="line">    setContentView(R.layout.activity_test_main)</span><br><span class="line">    jump_btn.setOnClickListener &#123;</span><br><span class="line">        <span class="keyword">val</span> intent = Intent(<span class="keyword">this</span>,TestMainActivity::<span class="class"><span class="keyword">class</span>.<span class="title">java</span>)</span></span><br><span class="line">        intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP</span><br><span class="line">        startActivity(intent)</span><br><span class="line">    &#125;</span><br><span class="line">    logInfo(<span class="string">"taskId is <span class="variable">$taskId</span>"</span>)</span><br><span class="line">    logInfo(<span class="string">"onCreate"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>具体效果和上述的 singleTop 一致</p>
+<h3 id="FLAG-ACTIVITY-NEW-TASK"><a href="#FLAG-ACTIVITY-NEW-TASK" class="headerlink" title="FLAG_ACTIVITY_NEW_TASK"></a>FLAG_ACTIVITY_NEW_TASK</h3><p><del>按照官方文档说法，该 Flag 和 singleTask 的效果一致</del>,代码实现如下</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">".task.TestMainActivity"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">activity</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onCreate</span><span class="params">(savedInstanceState: <span class="type">Bundle</span>?)</span></span> &#123;</span><br><span class="line">    <span class="keyword">super</span>.onCreate(savedInstanceState)</span><br><span class="line">    setContentView(R.layout.activity_test_main)</span><br><span class="line">    jump_btn.setOnClickListener &#123;</span><br><span class="line">        <span class="keyword">val</span> intent = Intent(<span class="keyword">this</span>,TestMainActivity::<span class="class"><span class="keyword">class</span>.<span class="title">java</span>)</span></span><br><span class="line">        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK</span><br><span class="line">        intent.putExtra(<span class="string">"number"</span>,<span class="string">"1"</span>)</span><br><span class="line">        startActivity(intent)</span><br><span class="line">    &#125;</span><br><span class="line">    logInfo(<span class="string">"taskId is <span class="variable">$taskId</span>"</span>)</span><br><span class="line">    logInfo(<span class="string">"onCreate"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>执行操作: 点击按钮，从 TestMainActivity -&gt; FirstActivity -&gt; TestMainActivity -&gt; FirstActivity。</li>
+<li>输出日志: </li>
+</ul>
+<p><img src="https://i.imgur.com/kp7gCV0.jpg" alt="Imgur"></p>
+<p>根据输出日志可以看出，两个 Activity 都处于同一个任务栈中，并且每个 Activity 都是单独的实例，也就是当前栈中总共有 4 个 ACtivity。</p>
+<p>也就是说 <code>FLAG_ACTIVITY_NEW_TASK</code> 在当前情况下的作用就是相当于没作用，Activity 的创建没有发生实际的改变。</p>
+<p><strong>所以官方文档的描述是不够准确的</strong></p>
+<p>想要实现和 singleTask 的效果，需要在 Androidmanafest 文件中设置 <code>taskAffinity</code> 属性</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">".task.FirstActivity"</span></span></span><br><span class="line"><span class="tag">  <span class="attr">android:taskAffinity</span>=<span class="string">"com.koga.android_learing.test"</span></span></span><br><span class="line"><span class="tag">&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>设置完之后再执行一次</p>
+<ul>
+<li>执行操作: 点击按钮，从 TestMainActivity -&gt; FirstActivity -&gt; TestMainActivity -&gt; FirstActivity。</li>
+<li>输出日志: </li>
+</ul>
+<p><img src="https://i.imgur.com/T0ZjgWr.jpg" alt="Imgur"></p>
+<p>这次的日志显示结果比较特别，从 taskId 可以看出如图的栈结构</p>
+<p><img src="https://i.imgur.com/HE5UYqK.jpg" alt="Imgur"></p>
+<p>这表明在设定了 <code>taskAffinity</code> 属性后， Activity 的启动确实具有了 singleTask 的一些效果，能够创建新的 Task 栈来存放 Activity。</p>
+<p>但是第二个 FirstActivity 无论如何点击，都不会创建。这是因为按照 singleTask 的要求，一个任务栈中只存在一个 Activity 实例，而此时已经存在了，所以不会再创建第二个 FirstActivity。而它又不具备销毁其之上 Activity 的功能，所以最终的结果就如此。</p>
+<p>所以想要实现 singleTask 的效果，不仅仅需要设置 <code>taskAffinity</code> 属性，还需要配和下面的 <code>FLAG_ACTIVITY_CLEAR_TOP</code> 标签一起使用才可</p>
+<h3 id="FLAG-ACTIVITY-CLEAR-TOP"><a href="#FLAG-ACTIVITY-CLEAR-TOP" class="headerlink" title="FLAG_ACTIVITY_CLEAR_TOP"></a>FLAG_ACTIVITY_CLEAR_TOP</h3><p>该标签的作用就是当启动的 Activity 已经存在于栈中，则会销毁其之上的 Activity，然后使用 <code>onNewIntent</code> 方法来进行复用。</p>
+<p>该标签通产都会搭配 <code>FLAG_ACTIVITY_NEW_TASK</code> 使用。</p>
+<p>以下代码通过 <code>FLAG_ACTIVITY_CLEAR_TOP</code> 和  <code>FLAG_ACTIVITY_NEW_TASK</code> 实现 singleTask 的效果</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">".task.FirstActivity"</span></span></span><br><span class="line"><span class="tag">  <span class="attr">android:taskAffinity</span>=<span class="string">"com.koga.android_learing.test"</span></span></span><br><span class="line"><span class="tag">&gt;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onCreate</span><span class="params">(savedInstanceState: <span class="type">Bundle</span>?)</span></span> &#123;</span><br><span class="line">    <span class="keyword">super</span>.onCreate(savedInstanceState)</span><br><span class="line">    setContentView(R.layout.activity_test_main)</span><br><span class="line">    jump_btn.setOnClickListener &#123;</span><br><span class="line">        <span class="keyword">val</span> intent = Intent(<span class="keyword">this</span>,TestMainActivity::<span class="class"><span class="keyword">class</span>.<span class="title">java</span>)</span></span><br><span class="line">        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP</span><br><span class="line">        intent.putExtra(<span class="string">"number"</span>,<span class="string">"1"</span>)</span><br><span class="line">        startActivity(intent)</span><br><span class="line">    &#125;</span><br><span class="line">    logInfo(<span class="string">"taskId is <span class="variable">$taskId</span>"</span>)</span><br><span class="line">    logInfo(<span class="string">"onCreate"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>执行操作: 点击按钮，从 TestMainActivity -&gt; FirstActivity -&gt; TestMainActivity -&gt; FirstActivity。</li>
+<li>输出日志: </li>
+</ul>
+<p><img src="https://i.imgur.com/uT7xnwS.jpg" alt="Imgur"></p>
+<p>此时按下返回键，先跳转至 <code>TestMainActivity</code>，然后是 <code>TestMainActivity</code> 之前的页面。这样的页面效果和 <code>singleTask</code> 相似。</p>
+<p>但是从日志可以看出，虽然日志也很相似，但是在第二次创建 <code>FirstActivity</code> 时，<strong>并没有执行 <code>onNewIntent</code> 方法</strong></p>
+<h2 id="Manifest-其他属性"><a href="#Manifest-其他属性" class="headerlink" title="Manifest 其他属性"></a>Manifest 其他属性</h2><h3 id="taskAffinity"><a href="#taskAffinity" class="headerlink" title="taskAffinity"></a>taskAffinity</h3><p>前面有提到该属性，可以通过该属性来决定 Activity 的任务栈，默认为包名</p>
+<h3 id="allowTaskReparenting"><a href="#allowTaskReparenting" class="headerlink" title="allowTaskReparenting"></a>allowTaskReparenting</h3><p>默认为 false， 如果为 true 时，会允许 Activity 从任务栈移动，从启动时的任务栈移动至其现在的任务栈</p>
+<h3 id="alwaysRetainTaskState"><a href="#alwaysRetainTaskState" class="headerlink" title="alwaysRetainTaskState"></a>alwaysRetainTaskState</h3><p>默认情况下，系统会在用户离开当前任务栈后的一段时间后，对任务栈进行清空，只留下最初始的 Activity。</p>
+<p>如果在最初始的 Activity 设置该属性为 true，则上述行为不会发生，所以的 Activity 都会保留</p>
+<h3 id="clearTaskOnLaunch"><a href="#clearTaskOnLaunch" class="headerlink" title="clearTaskOnLaunch"></a>clearTaskOnLaunch</h3><p>在任务栈栈底的 Activity 设置该属性为 true 后，每当用户离开当前任务栈，都会立刻触发上述默认行为</p>
+<h3 id="finishOnTaskLaunch"><a href="#finishOnTaskLaunch" class="headerlink" title="finishOnTaskLaunch"></a>finishOnTaskLaunch</h3><p>该属性可对任务栈中的任意 Activity 设置（包括栈底的 Activity），设置为 true 后，每当用户离开任务栈，该 Activity 都会销毁</p>
+<h4 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h4><ol>
+<li><a href="https://wangkuiwu.github.io/2014/06/26/LaunchMode/" target="_blank" rel="noopener">Android 启动模式</a></li>
+<li><a href="https://wangkuiwu.github.io/2014/06/26/IntentFlag/#anchor5" target="_blank" rel="noopener">Android Intent Flag与启动模式</a></li>
+<li><a href="https://developer.android.google.cn/guide/components/activities/tasks-and-back-stack" target="_blank" rel="noopener">Android Activity Task</a></li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/学习笔记/" rel="tag"># 学习笔记</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/08/14/CircleDialog/" rel="next" title="CircleDialog 的使用与实现">
+                <i class="fa fa-chevron-left"></i> CircleDialog 的使用与实现
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Koga Leung</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Acitivity-的启动模式"><span class="nav-number">1.</span> <span class="nav-text">Acitivity 的启动模式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#launchMode"><span class="nav-number">1.1.</span> <span class="nav-text">launchMode</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#singleTop"><span class="nav-number">1.1.1.</span> <span class="nav-text">singleTop</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#singleTask"><span class="nav-number">1.1.2.</span> <span class="nav-text">singleTask</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#singleInstance"><span class="nav-number">1.1.3.</span> <span class="nav-text">singleInstance</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#onNewIntent"><span class="nav-number">1.1.4.</span> <span class="nav-text">onNewIntent</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Intent-Flag"><span class="nav-number">1.2.</span> <span class="nav-text">Intent Flag</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#FLAG-ACTIVITY-SINGLE-TOP"><span class="nav-number">1.2.1.</span> <span class="nav-text">FLAG_ACTIVITY_SINGLE_TOP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#FLAG-ACTIVITY-NEW-TASK"><span class="nav-number">1.2.2.</span> <span class="nav-text">FLAG_ACTIVITY_NEW_TASK</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#FLAG-ACTIVITY-CLEAR-TOP"><span class="nav-number">1.2.3.</span> <span class="nav-text">FLAG_ACTIVITY_CLEAR_TOP</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Manifest-其他属性"><span class="nav-number">1.3.</span> <span class="nav-text">Manifest 其他属性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#taskAffinity"><span class="nav-number">1.3.1.</span> <span class="nav-text">taskAffinity</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#allowTaskReparenting"><span class="nav-number">1.3.2.</span> <span class="nav-text">allowTaskReparenting</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#alwaysRetainTaskState"><span class="nav-number">1.3.3.</span> <span class="nav-text">alwaysRetainTaskState</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#clearTaskOnLaunch"><span class="nav-number">1.3.4.</span> <span class="nav-text">clearTaskOnLaunch</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#finishOnTaskLaunch"><span class="nav-number">1.3.5.</span> <span class="nav-text">finishOnTaskLaunch</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#参考"><span class="nav-number">1.3.5.1.</span> <span class="nav-text">参考</span></a></li></ol></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Koga Leung</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
