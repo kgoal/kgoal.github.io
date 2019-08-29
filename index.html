@@ -342,44 +342,18 @@
       
         
           
-            <h1 id="Activity-知识点"><a href="#Activity-知识点" class="headerlink" title="Activity 知识点"></a>Activity 知识点</h1><h2 id="生命周期"><a href="#生命周期" class="headerlink" title="生命周期"></a>生命周期</h2><p><img src="https://i.imgur.com/jwhtejm.jpg" alt="Imgur"></p>
-<h3 id="onCreate"><a href="#onCreate" class="headerlink" title="onCreate"></a>onCreate</h3><p>整个 Activity 的入口，生命周期内只执行一次。在这个生命周期内，需要通过 <code>setCotentView</code> 方法指定要显示的 View</p>
-<h3 id="onStart"><a href="#onStart" class="headerlink" title="onStart"></a>onStart</h3><p>在 Activity 展示到前台前，执行的操作</p>
-<h3 id="onResume"><a href="#onResume" class="headerlink" title="onResume"></a>onResume</h3><p>在这个生命周期时需要注意的是，按照上图的流程，是有可能会出现 onPause 生命周期到 onResume生命周期的。所以此时也会再次调用 onResume 方法</p>
-<p>想要实现上述场景有两种方式，一种是通过一个半透明的 Activity 来遮挡现在的 Activity，具体查看 <a href="https://www.jianshu.com/p/839901db634e" target="_blank" rel="noopener">重现onPause到onResume生命周期</a>；</p>
-<p>另一种方式则是官方文档中提及的多窗口模式，在该模式下，如果点击另一个窗口，则其他的窗口则会处于 onPause 状态；</p>
-<h3 id="onPasue"><a href="#onPasue" class="headerlink" title="onPasue"></a>onPasue</h3><p>在用户离开当前 Activity 时触发，也表明当前 Activity 不再处于前台（不意味着 Activity 不可见，参考上述例子） </p>
-<p>该生命周期十分短暂，不推荐做耗时的操作</p>
-<p>不像 <code>onStart</code> 和 <code>onCreate</code>， <code>onPasue</code> 执行完之后，Activity 不一定会发生变化，可能会处于 <code>pause</code> 状态，直到当前 Activity 对用户不可见，然后进入 <code>stop</code> 状态或者是 Activity 重新活动，进入 <code>resume</code> 状态</p>
-<h3 id="onStop"><a href="#onStop" class="headerlink" title="onStop"></a>onStop</h3><p>此时 Activity 已经不可见了，但是 Activity 还是被保存在内存中。内存中的 Activity 可能会因为内存不足而被系统释放。</p>
-<p>在该回调方法可以执行耗时的操作</p>
-<p>根据生命周期图，可以从 stop 状态进入 <code>onCreate</code>,<code>onRestart</code> 一集 <code>onDestroy</code></p>
-<h3 id="onDestroy"><a href="#onDestroy" class="headerlink" title="onDestroy"></a>onDestroy</h3><p>可以通过 <code>isFinishing()</code> 方法来判断 Activity 是否被销毁，因为有可能是因为 Activity 的配置改变而执行的 <code>onDestroy</code>  方法，在此之后，系统会立刻创建一个新的 Activity。</p>
-<h3 id="多-Activity-的生命周期"><a href="#多-Activity-的生命周期" class="headerlink" title="多 Activity 的生命周期"></a>多 Activity 的生命周期</h3><p>当从 A 跳转至 B 时：</p>
-<ol>
-<li>A -&gt; onPasue</li>
-<li>B -&gt; onCreate -&gt; onStart -&gt; onResume</li>
-<li>A -&gt; onStop</li>
-</ol>
-<h4 id="LifecycleObserver"><a href="#LifecycleObserver" class="headerlink" title="LifecycleObserver"></a>LifecycleObserver</h4><p>这是官方提供的一个组件，能够对 Activity 的生命周期进行监听，会触发事件，订阅者可以收到事件响应。</p>
-<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 使用 LifecycleObserver</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TestComponent</span>:<span class="type">LifecycleObserver &#123;</span></span></span><br><span class="line">    <span class="meta">@OnLifecycleEvent(Lifecycle.Event.ON_RESUME)</span></span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">init</span><span class="params">()</span></span> &#123;</span><br><span class="line">       doSomething....</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 以前的方式</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TestActivity</span>:<span class="type">Activity &#123;</span></span></span><br><span class="line">    onCreate(..)&#123;...&#125;</span><br><span class="line">    </span><br><span class="line">    onResume()&#123;</span><br><span class="line">      doSomething....</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>同样的逻辑，官方更加的推荐使用 LifecycleObserver 的方式来实现，因为这样可以实现代码的服用，避免在多个 Activit 中编写 onResume 的相同逻辑</p>
-<h2 id="状态保存"><a href="#状态保存" class="headerlink" title="状态保存"></a>状态保存</h2><p>对于 Activity，其有可能会被系统销毁，也有可能按照用户的想法进行销毁。对于前者，需要将当前的状态保存下来。</p>
-<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onSaveInstanceState</span><span class="params">(outState: <span class="type">Bundle</span>?)</span></span> &#123;</span><br><span class="line">    <span class="comment">// Save the user's current game state</span></span><br><span class="line">    outState?.run &#123;</span><br><span class="line">        putInt(STATE_SCORE, currentScore)</span><br><span class="line">        putInt(STATE_LEVEL, currentLevel)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Always call the superclass so it can save the view hierarchy state</span></span><br><span class="line">    <span class="keyword">super</span>.onSaveInstanceState(outState)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">companion</span> <span class="keyword">object</span> &#123;</span><br><span class="line">    <span class="keyword">val</span> STATE_SCORE = <span class="string">"playerScore"</span></span><br><span class="line">    <span class="keyword">val</span> STATE_LEVEL = <span class="string">"playerLevel"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>默认的 <code>onSaveInstanceState</code> 方法只会将 Activity 的视图状态保留下来，如果需要保存自定义的变量，需要重写该方法来完成。</p>
-<p>该方法是由系统自动调用的，但如是 Activity 是因为调用了 <code>finish()</code> 方法而被关闭，该方法是不会被执行的。同理，按下返回键也是如此</p>
-<p>也不推荐在 <code>onSaveInstanceState</code> 方法中对复杂数据进行保存，因为这会进行序列化和反序列化的操作。</p>
-<p>至于保存起来的状态，可以在 <code>onCreate</code> 或者是 <code>onRestoreInstanceState</code> 方法中拿到。</p>
-<h2 id="app-之间交互"><a href="#app-之间交互" class="headerlink" title="app 之间交互"></a>app 之间交互</h2><p>通过 Intent 来启动其他 APP，通过 Action 和 uri 两个值来决定使用哪种 app</p>
-<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">test_btn.setOnClickListener &#123;</span><br><span class="line">    Intent(Intent.ACTION_VIEW, Uri.parse(<span class="string">"https://www.google.com"</span>)).run &#123;</span><br><span class="line">        <span class="comment">// 创建选择器</span></span><br><span class="line">        Intent.createChooser(<span class="keyword">this</span>, <span class="string">"test"</span>)</span><br><span class="line">    &#125;.apply &#123;</span><br><span class="line">        <span class="comment">// 检查是否有处理 Intent 的 app</span></span><br><span class="line">        <span class="keyword">if</span> (packageManager.queryIntentActivities(<span class="keyword">this</span>, <span class="number">0</span>).isNotEmpty()) &#123;</span><br><span class="line">            startActivity(<span class="keyword">this</span>)</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            toast(<span class="string">"not found"</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>其中选择器的作用在于传入的第二个参数会作为弹出选择框的标题，并且如果设置了选择器，在没有可用 app 时，也会弹出选择框，并显示没有可用的 app</p>
-<p>除了使用 <code>startActivity</code>，也可以使用 <code>startActivityForResult</code> ，处理返回的结果。每个 app 处理的结果都不相同，需要根据约定好的方式来解析数据</p>
-<p>通过在 <code>AndroidManifest</code> 文件中，为 Activity 设置好 <code>&lt;Intent-filter&gt;</code> 标签以及 action，category 和 data 属性，能够将 activity 提供给其他 app 使用。</p>
-
-          
+          Activity 知识点生命周期
+onCreate整个 Activity 的入口，生命周期内只执行一次。在这个生命周期内，需要通过 setCotentView 方法指定要显示的 View
+onStart在 Activity 展示到前台前，执行的操作
+onResume在这个生命周期时需要注意的是，按照
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2019/08/26/Activity知识点/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -519,195 +493,19 @@
       
         
           
-            <h1 id="Acitivity-的启动模式"><a href="#Acitivity-的启动模式" class="headerlink" title="Acitivity 的启动模式"></a>Acitivity 的启动模式</h1><p>在了解启动模式前，先明白 Task 和回退栈的概念</p>
-<blockquote>
-<p>每启动一个 Activity 都会被放入回退栈中，并且遵循先进后出的规则。而一个 Task 对应一个回退栈（可以理解为同一个东西）。按照默认的情况，一个 app 应用会对应着一个 Task，也就是一个回退栈。</p>
-</blockquote>
-<p>启动模式改变的就是 Activity 放入回退栈的这一过程，其中可以通过以下方法来改变默认的情况</p>
-<ol>
-<li>修改 Manifest 文件中 Activity 的属性<ul>
-<li>taskAffinity</li>
-<li>launchMode</li>
-<li>allowTaskParenting</li>
-<li>clearTaskOnlaunch</li>
-<li>alwaysRetainTaskState</li>
-<li>finishOnTaskLaunch</li>
-</ul>
-</li>
-</ol>
-<ol start="2">
-<li>修改 Intent 中的 Flag 值<ul>
-<li>FLAG_ACTIVITY_NEW_TASK</li>
-<li>FLAG_ACTIVITY_CLEAR_TOP</li>
-<li>FLAG_ACTIVITY_SINGLE_TOP</li>
-</ul>
-</li>
-</ol>
-<blockquote>
-<p>可以通过修改 Manifest 文件来修改启动模式或者是 Intent 来更改，其中 Intent 中的更改优先级更高。</p>
-</blockquote>
-<h2 id="launchMode"><a href="#launchMode" class="headerlink" title="launchMode"></a>launchMode</h2><p>通过修改 launchMode 来决定 Activity 的启动模式，有以下 4 个选择</p>
-<ul>
-<li>standard （默认）</li>
-<li>singleTop</li>
-<li>singleTask</li>
-<li>singleInstance</li>
-</ul>
-<h3 id="singleTop"><a href="#singleTop" class="headerlink" title="singleTop"></a>singleTop</h3><p>singltTop 启动模式下， 假若 Activity 处于<strong>当前 Task 栈</strong>的顶端，则系统不会新建一个 Activity 而通过 <code>onNewIntent</code> 方法对其复用。</p>
-<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// TestMainActivity 文件</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TestMainActivity</span> : <span class="type">AppCompatActivity</span></span>() &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onCreate</span><span class="params">(savedInstanceState: <span class="type">Bundle</span>?)</span></span> &#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState)</span><br><span class="line">        setContentView(R.layout.activity_test_main)</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 跳转当前 Activity</span></span><br><span class="line">        jump_btn.setOnClickListener &#123;</span><br><span class="line">            startActivity(intentFor&lt;TestMainActivity&gt;(<span class="string">"number"</span> to  <span class="string">"1"</span>))</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 日志记录</span></span><br><span class="line">        logInfo(<span class="string">"taskId is <span class="variable">$taskId</span>"</span>)</span><br><span class="line">        logInfo(<span class="string">"onCreate"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    ... <span class="comment">// 每一个生命周期方法都有如上的日志记录，省略不写</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onNewIntent</span><span class="params">(intent: <span class="type">Intent</span>?)</span></span> &#123;</span><br><span class="line">        <span class="keyword">super</span>.onNewIntent(intent)</span><br><span class="line">        logInfo(<span class="string">"onNewIntent"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">logInfo</span><span class="params">(msg:<span class="type">String</span>)</span></span>&#123;</span><br><span class="line">        Log.i(LOG_TAG,msg)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">companion</span> <span class="keyword">object</span>&#123;</span><br><span class="line">        <span class="keyword">const</span> <span class="keyword">val</span> LOG_TAG = <span class="string">"Main Activity"</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+          Acitivity 的启动模式在了解启动模式前，先明白 Task 和回退栈的概念
 
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!--&lt;/AndroidManifest 文件&gt;--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">".task.TestMainActivity"</span></span></span><br><span class="line"><span class="tag">  <span class="attr">android:launchMode</span>=<span class="string">"singleTop"</span></span></span><br><span class="line"><span class="tag">&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">activity</span>&gt;</span></span><br></pre></td></tr></table></figure>
+每启动一个 Activity 都会被放入回退栈中，并且遵循先进后出的规则。而一个 Task 对应一个回退栈（可以理解为同一个东西）。按照默认的情况，一个 app 应用会对应着一个 Task，也就是一个回退栈。
 
-<ul>
-<li>执行操作: 多次点击页面的按钮，跳转 TestMainActivity 页面。</li>
-<li>输出日志: </li>
-</ul>
-<p><img src="https://i.imgur.com/5tQc5JH.jpg" alt="Imgur"></p>
-<p>根据日志可以看出，当前 Activity 所处的任务栈 id 为 189，并且整个日志输出中，只执行了一次 <code>onCreate</code>，这说明每次点击按钮后，系统都是复用顶层的 Activity。</p>
-<p>通过 <code>onNewIntent</code> 方法来进行复用，并且在<strong>这种情况下</strong>，复用后直接执行的是 <code>onResume</code> 方法。</p>
-<ul>
-<li>返回键</li>
-</ul>
-<p>此时按下返回键，会回到 <code>TestMainActivity</code> 的上一层 Activity</p>
-<h3 id="singleTask"><a href="#singleTask" class="headerlink" title="singleTask"></a>singleTask</h3><p>顾名思义，这种模式下，保证了 Activity 在 Task 栈中只有一个实例。</p>
-<p>在跳转至该 Activity 时：</p>
-<ol>
-<li>先判断其<strong>对应的 Task 栈</strong>是否存在，如果不存在，则新建 Task 栈并新增该 Activity；</li>
-<li>如果 Task 中已经存在，并且 Activity 在栈中已经存在一个实例，则会通过 <code>onNewIntent</code> 来直接复用，并且会销毁在其之上的 Activity；</li>
-<li>如果 Task 中如果不存在该 Activity 实例，则会新建一个 Activity。</li>
-</ol>
-<blockquote>
-<p>上面有提到对应的 Task 栈，这是指的 <code>Androidmanafest</code> 文件中的 <code>taskAffinity</code> 属性，通过该属性来设置 Activity 所对应的 Task 栈，默认为包名所对应的栈。</p>
-</blockquote>
-<p>先来测试下不设置 taskAffinity 属性的情况</p>
-<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">FirstActivity</span> : <span class="type">AppCompatActivity</span></span>() &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onCreate</span><span class="params">(savedInstanceState: <span class="type">Bundle</span>?)</span></span> &#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState)</span><br><span class="line">        setContentView(R.layout.activity_first)</span><br><span class="line">        back_btn.setOnClickListener &#123;</span><br><span class="line">            <span class="comment">// 跳转回去 TestMainActivity</span></span><br><span class="line">            <span class="comment">// 引入了 Anko 库</span></span><br><span class="line">            startActivity(intentFor&lt;TestMainActivity&gt;(<span class="string">"number"</span> to <span class="string">"3"</span>))</span><br><span class="line">        &#125;</span><br><span class="line">        logInfo(<span class="string">"taskId is <span class="variable">$taskId</span>"</span>)</span><br><span class="line">        logInfo(<span class="string">"onCreate"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    ... 其余的和上面例子一致</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>除此之外，还需要把 <code>TestMainActivity</code> 中按钮跳转的页面修改为 <code>FirstActivity</code>，还要 xml 文件也需要修改。</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">".task.FirstActivity"</span></span></span><br><span class="line"><span class="tag">  <span class="attr">android:launchMode</span>=<span class="string">"singleTask"</span></span></span><br><span class="line"><span class="tag">&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">activity</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">".task.TestMainActivity"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">activity</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>执行操作: 点击按钮，从 TestMainActivity -&gt; FirstActivity -&gt; TestMainActivity -&gt; FirstActivity。</li>
-<li>输出日志: </li>
-</ul>
-<p><img src="https://i.imgur.com/Ejaz856.jpg" alt="Imgur"></p>
-<ol>
-<li>从 taskId 可以看出，两个 Activity 都处于同一个栈中。</li>
-<li>第一次进入 FirstActivity 时，则是走正常的生命周期创建，而在第二次进入 FirstActivity 时，则是通过 <code>onNewIntent</code> 进入的，并且是从 <code>onRestart</code> 开始执行。</li>
-<li>第二次创建的 TestMainActivity 在进入 FirstActivity 时，被销毁了。这表明在复用时，会销毁其上面的 Activity。</li>
-</ol>
-<ul>
-<li>返回键:</li>
-</ul>
-<p>按下返回键，第一次回到 TestMainActivity，第二次回到 TestMainActivity 的上一层 Activity。</p>
-<p>如果修改了 <code>taskAffinity</code> 属性，不使用默认的栈。</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">".task.FirstActivity"</span></span></span><br><span class="line"><span class="tag">  <span class="attr">android:launchMode</span>=<span class="string">"singleTask"</span></span></span><br><span class="line"><span class="tag">  <span class="attr">android:taskAffinity</span>=<span class="string">"com.koga.android_learning.test10"</span></span></span><br><span class="line"><span class="tag">&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">activity</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">".task.TestMainActivity"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">activity</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p>其余代码保持不变</p>
-<ul>
-<li>执行操作: 点击按钮，从 TestMainActivity -&gt; FirstActivity -&gt; TestMainActivity -&gt; FirstActivity。</li>
-<li>输出日志: </li>
-</ul>
-<p><img src="https://i.imgur.com/6khLz8x.jpg" alt="Imgur"></p>
-<ol>
-<li>从 taskId 可以看出，两个 Activity 都处于不同的栈中，这表明设置 <code>taskAffinity</code> 的属性确实有影响。</li>
-<li>第一次进入 FirstActivity 时，则是走正常的生命周期创建，而在第二次进入 FirstActivity 时，则是通过 <code>onNewIntent</code> 进入的，并且是从 <code>onRestart</code> 开始执行。</li>
-</ol>
-<ul>
-<li>返回键:</li>
-</ul>
-<p>按下返回键，第一次回到 TestMainActivity，第二次回到 TestMainActivity 的上一层 Activity。</p>
-<blockquote>
-<p>即使在新的栈中创建 Activity，也能够返回到另一个栈中的 Activity。</p>
-</blockquote>
-<h3 id="singleInstance"><a href="#singleInstance" class="headerlink" title="singleInstance"></a>singleInstance</h3><p>这个启动模式下的 Activity 在所有任务栈中只存在一个实例。是因为这个 Activity 在创建时，会单独创建一个 Task 栈来存放，并且该任务栈不能够再存放其他的 Activity。也就是说，这个任务栈只存放一个 Activity。</p>
-<blockquote>
-<p>该模式不受 <code>taskAffinity</code> 影响</p>
-</blockquote>
-<p>Androidmanafest 文件修改如下，其余代码不变</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">".task.FirstActivity"</span></span></span><br><span class="line"><span class="tag">  <span class="attr">android:launchMode</span>=<span class="string">"singleInstance"</span></span></span><br><span class="line"><span class="tag">&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">activity</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">".task.TestMainActivity"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">activity</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>执行操作: 点击按钮，从 TestMainActivity -&gt; FirstActivity -&gt; TestMainActivity -&gt; FirstActivity。</li>
-<li>输出日志: </li>
-</ul>
-<p><img src="https://i.imgur.com/nsxhlNo.jpg" alt="Imgur"></p>
-<ol>
-<li>从 taskId 可以看出，TestMainActivity 都是在 195 任务栈，FirstActivity 都是在 196 任务栈。这表明从 FirstActivity 启动的 TestMainActivity 不会在 196 中创建，而是根据其 <code>taskAffinity</code> 来决定（没有设置就是默认）</li>
-<li>在第二次进入 FirstActivity 时，不会再销毁 TestMainActivity 了。</li>
-</ol>
-<ul>
-<li>返回键:</li>
-</ul>
-<p>按下返回键，第一次回到 TestMainActivity，第二次也回到了 TestMainActivity，第三次回到 TestMainActivity 的上一层 Activity。</p>
-<p>这是因为 TestMainActivity 创建了两次，并且都没被销毁，如果想要实现只出现一次 TestMainActivity 的话，只需要在 xml 文件中，为 TestMainActivity 添加 singleTop 启动模式即可。</p>
-<h3 id="onNewIntent"><a href="#onNewIntent" class="headerlink" title="onNewIntent"></a>onNewIntent</h3><p>这个方法有两个细节：</p>
-<ol>
-<li>在执行该方法后，有可能执行 <code>onRestart</code>，也有可能执行 <code>onResume</code> 方法，这取决于该 Activity 当前的状态（按照上述日志得出的结果）</li>
-<li>在调用 onNewIntent 复用 Activity 时，如果不设置新的 intent，则会使用旧的。</li>
-</ol>
-<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onNewIntent</span><span class="params">(intent: <span class="type">Intent</span>?)</span></span> &#123;</span><br><span class="line">    <span class="keyword">super</span>.onNewIntent(intent)</span><br><span class="line">    intent?.putExtra(<span class="string">"number"</span>,<span class="string">"2"</span>)</span><br><span class="line">    <span class="comment">// 通过 setIntent 来传入新的 intent</span></span><br><span class="line">    setIntent(intent)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>根据这两个细节，所以也应该考虑对 intent 数据的操作是放在那个生命周期中执行。</p>
-<h2 id="Intent-Flag"><a href="#Intent-Flag" class="headerlink" title="Intent Flag"></a>Intent Flag</h2><h3 id="FLAG-ACTIVITY-SINGLE-TOP"><a href="#FLAG-ACTIVITY-SINGLE-TOP" class="headerlink" title="FLAG_ACTIVITY_SINGLE_TOP"></a>FLAG_ACTIVITY_SINGLE_TOP</h3><p>按照官方文档说法，该 Flag 和 singleTop 的效果一致,代码实现如下</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">".task.TestMainActivity"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">activity</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onCreate</span><span class="params">(savedInstanceState: <span class="type">Bundle</span>?)</span></span> &#123;</span><br><span class="line">    <span class="keyword">super</span>.onCreate(savedInstanceState)</span><br><span class="line">    setContentView(R.layout.activity_test_main)</span><br><span class="line">    jump_btn.setOnClickListener &#123;</span><br><span class="line">        <span class="keyword">val</span> intent = Intent(<span class="keyword">this</span>,TestMainActivity::<span class="class"><span class="keyword">class</span>.<span class="title">java</span>)</span></span><br><span class="line">        intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP</span><br><span class="line">        startActivity(intent)</span><br><span class="line">    &#125;</span><br><span class="line">    logInfo(<span class="string">"taskId is <span class="variable">$taskId</span>"</span>)</span><br><span class="line">    logInfo(<span class="string">"onCreate"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>具体效果和上述的 singleTop 一致</p>
-<h3 id="FLAG-ACTIVITY-NEW-TASK"><a href="#FLAG-ACTIVITY-NEW-TASK" class="headerlink" title="FLAG_ACTIVITY_NEW_TASK"></a>FLAG_ACTIVITY_NEW_TASK</h3><p><del>按照官方文档说法，该 Flag 和 singleTask 的效果一致</del>,代码实现如下</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">".task.TestMainActivity"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">activity</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onCreate</span><span class="params">(savedInstanceState: <span class="type">Bundle</span>?)</span></span> &#123;</span><br><span class="line">    <span class="keyword">super</span>.onCreate(savedInstanceState)</span><br><span class="line">    setContentView(R.layout.activity_test_main)</span><br><span class="line">    jump_btn.setOnClickListener &#123;</span><br><span class="line">        <span class="keyword">val</span> intent = Intent(<span class="keyword">this</span>,TestMainActivity::<span class="class"><span class="keyword">class</span>.<span class="title">java</span>)</span></span><br><span class="line">        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK</span><br><span class="line">        intent.putExtra(<span class="string">"number"</span>,<span class="string">"1"</span>)</span><br><span class="line">        startActivity(intent)</span><br><span class="line">    &#125;</span><br><span class="line">    logInfo(<span class="string">"taskId is <span class="variable">$taskId</span>"</span>)</span><br><span class="line">    logInfo(<span class="string">"onCreate"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>执行操作: 点击按钮，从 TestMainActivity -&gt; FirstActivity -&gt; TestMainActivity -&gt; FirstActivity。</li>
-<li>输出日志: </li>
-</ul>
-<p><img src="https://i.imgur.com/kp7gCV0.jpg" alt="Imgur"></p>
-<p>根据输出日志可以看出，两个 Activity 都处于同一个任务栈中，并且每个 Activity 都是单独的实例，也就是当前栈中总共有 4 个 ACtivity。</p>
-<p>也就是说 <code>FLAG_ACTIVITY_NEW_TASK</code> 在当前情况下的作用就是相当于没作用，Activity 的创建没有发生实际的改变。</p>
-<p><strong>所以官方文档的描述是不够准确的</strong></p>
-<p>想要实现和 singleTask 的效果，需要在 Androidmanafest 文件中设置 <code>taskAffinity</code> 属性</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">".task.FirstActivity"</span></span></span><br><span class="line"><span class="tag">  <span class="attr">android:taskAffinity</span>=<span class="string">"com.koga.android_learing.test"</span></span></span><br><span class="line"><span class="tag">&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p>设置完之后再执行一次</p>
-<ul>
-<li>执行操作: 点击按钮，从 TestMainActivity -&gt; FirstActivity -&gt; TestMainActivity -&gt; FirstActivity。</li>
-<li>输出日志: </li>
-</ul>
-<p><img src="https://i.imgur.com/T0ZjgWr.jpg" alt="Imgur"></p>
-<p>这次的日志显示结果比较特别，从 taskId 可以看出如图的栈结构</p>
-<p><img src="https://i.imgur.com/HE5UYqK.jpg" alt="Imgur"></p>
-<p>这表明在设定了 <code>taskAffinity</code> 属性后， Activity 的启动确实具有了 singleTask 的一些效果，能够创建新的 Task 栈来存放 Activity。</p>
-<p>但是第二个 FirstActivity 无论如何点击，都不会创建。这是因为按照 singleTask 的要求，一个任务栈中只存在一个 Activity 实例，而此时已经存在了，所以不会再创建第二个 FirstActivity。而它又不具备销毁其之上 Activity 的功能，所以最终的结果就如此。</p>
-<p>所以想要实现 singleTask 的效果，不仅仅需要设置 <code>taskAffinity</code> 属性，还需要配和下面的 <code>FLAG_ACTIVITY_CLEAR_TOP</code> 标签一起使用才可</p>
-<h3 id="FLAG-ACTIVITY-CLEAR-TOP"><a href="#FLAG-ACTIVITY-CLEAR-TOP" class="headerlink" title="FLAG_ACTIVITY_CLEAR_TOP"></a>FLAG_ACTIVITY_CLEAR_TOP</h3><p>该标签的作用就是当启动的 Activity 已经存在于栈中，则会销毁其之上的 Activity，然后使用 <code>onNewIntent</code> 方法来进行复用。</p>
-<p>该标签通产都会搭配 <code>FLAG_ACTIVITY_NEW_TASK</code> 使用。</p>
-<p>以下代码通过 <code>FLAG_ACTIVITY_CLEAR_TOP</code> 和  <code>FLAG_ACTIVITY_NEW_TASK</code> 实现 singleTask 的效果</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">".task.FirstActivity"</span></span></span><br><span class="line"><span class="tag">  <span class="attr">android:taskAffinity</span>=<span class="string">"com.koga.android_learing.test"</span></span></span><br><span class="line"><span class="tag">&gt;</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onCreate</span><span class="params">(savedInstanceState: <span class="type">Bundle</span>?)</span></span> &#123;</span><br><span class="line">    <span class="keyword">super</span>.onCreate(savedInstanceState)</span><br><span class="line">    setContentView(R.layout.activity_test_main)</span><br><span class="line">    jump_btn.setOnClickListener &#123;</span><br><span class="line">        <span class="keyword">val</span> intent = Intent(<span class="keyword">this</span>,TestMainActivity::<span class="class"><span class="keyword">class</span>.<span class="title">java</span>)</span></span><br><span class="line">        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP</span><br><span class="line">        intent.putExtra(<span class="string">"number"</span>,<span class="string">"1"</span>)</span><br><span class="line">        startActivity(intent)</span><br><span class="line">    &#125;</span><br><span class="line">    logInfo(<span class="string">"taskId is <span class="variable">$taskId</span>"</span>)</span><br><span class="line">    logInfo(<span class="string">"onCreate"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>执行操作: 点击按钮，从 TestMainActivity -&gt; FirstActivity -&gt; TestMainActivity -&gt; FirstActivity。</li>
-<li>输出日志: </li>
-</ul>
-<p><img src="https://i.imgur.com/uT7xnwS.jpg" alt="Imgur"></p>
-<p>此时按下返回键，先跳转至 <code>TestMainActivity</code>，然后是 <code>TestMainActivity</code> 之前的页面。这样的页面效果和 <code>singleTask</code> 相似。</p>
-<p>但是从日志可以看出，虽然日志也很相似，但是在第二次创建 <code>FirstActivity</code> 时，<strong>并没有执行 <code>onNewIntent</code> 方法</strong></p>
-<h2 id="Manifest-其他属性"><a href="#Manifest-其他属性" class="headerlink" title="Manifest 其他属性"></a>Manifest 其他属性</h2><h3 id="taskAffinity"><a href="#taskAffinity" class="headerlink" title="taskAffinity"></a>taskAffinity</h3><p>前面有提到该属性，可以通过该属性来决定 Activity 的任务栈，默认为包名</p>
-<h3 id="allowTaskReparenting"><a href="#allowTaskReparenting" class="headerlink" title="allowTaskReparenting"></a>allowTaskReparenting</h3><p>默认为 false， 如果为 true 时，会允许 Activity 从任务栈移动，从启动时的任务栈移动至其现在的任务栈</p>
-<h3 id="alwaysRetainTaskState"><a href="#alwaysRetainTaskState" class="headerlink" title="alwaysRetainTaskState"></a>alwaysRetainTaskState</h3><p>默认情况下，系统会在用户离开当前任务栈后的一段时间后，对任务栈进行清空，只留下最初始的 Activity。</p>
-<p>如果在最初始的 Activity 设置该属性为 true，则上述行为不会发生，所以的 Activity 都会保留</p>
-<h3 id="clearTaskOnLaunch"><a href="#clearTaskOnLaunch" class="headerlink" title="clearTaskOnLaunch"></a>clearTaskOnLaunch</h3><p>在任务栈栈底的 Activity 设置该属性为 true 后，每当用户离开当前任务栈，都会立刻触发上述默认行为</p>
-<h3 id="finishOnTaskLaunch"><a href="#finishOnTaskLaunch" class="headerlink" title="finishOnTaskLaunch"></a>finishOnTaskLaunch</h3><p>该属性可对任务栈中的任意 Activity 设置（包括栈底的 Activity），设置为 true 后，每当用户离开任务栈，该 Activity 都会销毁</p>
-<h4 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h4><ol>
-<li><a href="https://wangkuiwu.github.io/2014/06/26/LaunchMode/" target="_blank" rel="noopener">Android 启动模式</a></li>
-<li><a href="https://wangkuiwu.github.io/2014/06/26/IntentFlag/#anchor5" target="_blank" rel="noopener">Android Intent Flag与启动模式</a></li>
-<li><a href="https://developer.android.google.cn/guide/components/activities/tasks-and-back-stack" target="_blank" rel="noopener">Android Activity Task</a></li>
-</ol>
-
-          
+启动
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2019/08/26/LaunchMode/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -847,140 +645,22 @@
       
         
           
-            <h1 id="CircleDialog-的使用与实现"><a href="#CircleDialog-的使用与实现" class="headerlink" title="CircleDialog 的使用与实现"></a>CircleDialog 的使用与实现</h1><p>引入方式  </p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">com.mylhyl:circleDialog:5.0.2</span><br></pre></td></tr></table></figure>
+          CircleDialog 的使用与实现引入方式  
+1com.mylhyl:circleDialog:5.0.2
 
-<h2 id="目的"><a href="#目的" class="headerlink" title="目的"></a>目的</h2><ol>
-<li>了解如何自定义弹出框</li>
-<li>如何自定义 View</li>
-</ol>
-<h2 id="结构"><a href="#结构" class="headerlink" title="结构"></a>结构</h2><h3 id="CircleDialog"><a href="#CircleDialog" class="headerlink" title="CircleDialog"></a>CircleDialog</h3><p>CircleDialog 内部结构如图所示。Builder 则是建造者，通过 setXXX 方法来传入Dialog 参数。</p>
-<p><img src="https://i.imgur.com/RkZvGIz.png" alt="structure"></p>
-<p>在 Builder 方法在，涉及到了一些用来存放参数的类，如图所示，这些参数类用来定义弹出框的样式（颜色/位置/大小）。这些类都实现了 Parcelable 接口，所以可序列化存入 Bundle。</p>
-<p><img src="https://i.imgur.com/Cus26Yp.png" alt="Params"></p>
-<p>最后，Builder 通过 CircleParams 类来管理这些类。CircleParams 也需要实现可序列化。</p>
-<p>Builder 最终需要调用 show( ) 方法才能在页面显示出提示框，其内部调用的其实是 CircleDialog 的 create 和 show 方法。方法如下：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> BaseCircleDialog <span class="title">create</span><span class="params">(CircleParams params)</span> </span>&#123;</span><br><span class="line">    mBaseCircleDialog =BaseCircleDialog.newAbsCircleDialog(params);</span><br><span class="line">    <span class="keyword">return</span> mBaseCircleDialog;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">show</span><span class="params">(FragmentManager manager)</span> </span>&#123;</span><br><span class="line">    mBaseCircleDialog.show(manager, <span class="string">"circleDialog"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+目的
+了解如何自定义弹出框
+如何自定义 View
 
-<p>create 方法中接收的参数是 CircleParams 类型，也就是在 Builder 中使用 setXXX 方法后得到的弹出框的参数类。</p>
-<p>在方法内部调用了 <code>BaseCircleDialog.newAbsCircleDialog</code> 方法，这个稍后再讲。</p>
-<p>这个方法返回的值是 BaseCircleDialog 类型，在 show 方法中，也是调用 BaseCircleDialog 的 show  方法。所以，重心要转移到这个类上。</p>
-<p>CircleDialog 类只是充当一个建造者的作用。</p>
-<h3 id="BaseCircleDialog"><a href="#BaseCircleDialog" class="headerlink" title="BaseCircleDialog"></a>BaseCircleDialog</h3><p>继续上面提到的 <code>newAbsCircleDialog</code>  方法</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> BaseCircleDialog <span class="title">newAbsCircleDialog</span><span class="params">(CircleParams params)</span> </span>&#123;</span><br><span class="line">    BaseCircleDialog circleDialog = <span class="keyword">new</span> BaseCircleDialog();</span><br><span class="line">    circleDialog.mParams = params;</span><br><span class="line">    Bundle bundle = <span class="keyword">new</span> Bundle();</span><br><span class="line">    bundle.putParcelable(SAVED_PARAMS, params);</span><br><span class="line">    circleDialog.setArguments(bundle);</span><br><span class="line">    <span class="keyword">return</span> circleDialog;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>该方法的主要作用就是将传入的配置存起来，所以 XXXParams 类都需要实现可序列化的接口。</p>
-<p>其调用的 setArguments 是来自 Fragment 类的方法。因为该类间接继承了 DialogFragment 类</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">show</span><span class="params">(FragmentManager manager, String tag)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> FragmentTransaction transaction = manager.beginTransaction();</span><br><span class="line">    <span class="keyword">if</span> (isAdded()) &#123;</span><br><span class="line">        transaction.remove(<span class="keyword">this</span>).commit();</span><br><span class="line">    &#125;</span><br><span class="line">    transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);</span><br><span class="line">    transaction.add(<span class="keyword">this</span>, tag);</span><br><span class="line">    transaction.commitAllowingStateLoss();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>该方法重写了 DialogFragment 的  show 方法。重写前后的不同在于 isAdded 方法，对该 Fragment 进行判断，如果已经存在了，则先将他删除。</p>
-<p>从这里就可以看出，这个弹出框的生成方式和 fragment 生成方式相似，都是通过<br>获得 FragmentTransaction，对 fragment 进行添加删除显示在页面上的。这是因为继承的 DialogFragment 是 Fragment 的子类，</p>
-<blockquote>
-<p>DialogFragment 是 Google 提供的管理提示框的 Fragment 类，能够比直接使用 Dialog 或者是 AlertDialog 类更加方便的管理提示框的生命周期。</p>
-</blockquote>
-<blockquote>
-<p>下文也会提及 DialogFragment 的基本实现方式，而关于 Fragment 如何在添加后出现在页面上则留到其他文章讲解</p>
-</blockquote>
-<p>所以在调用 show 方法后，当前的 BaseCircleDialog 这个 fragment 就会通过  FragmentTransaction 被添加，然后按照 fragment 的流程走生命周期。</p>
-<p>下面按照生命周期的流程，查看 BaseCircleDialog 及其父类在生命周期方法中做了什么。</p>
-<blockquote>
-<p>继承关系:  BaseCircleDialog &lt;- AbsBaseCircleDialog &lt;- DialogFragment </p>
-</blockquote>
-<h4 id="onCreate"><a href="#onCreate" class="headerlink" title="onCreate"></a>onCreate</h4><p>三个类的主要是从 savedInstanceState 中拿取之前存储的数据。其中在 AbsBaseCircleDialog 类中，还获取了当前设备窗口的属性值以及设置了弹出框为无标题栏。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 获取窗口的的尺寸像素属性</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">SystemBarConfig</span><span class="params">(Activity activity)</span> </span>&#123;</span><br><span class="line">    Resources res = activity.getResources();</span><br><span class="line">    mStatusBarHeight = getInternalDimensionSize(res, STATUS_BAR_HEIGHT_RES_NAME);</span><br><span class="line">    DisplayMetrics metrics = <span class="keyword">new</span> DisplayMetrics();</span><br><span class="line">    activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);</span><br><span class="line">    mScreenWidth = metrics.widthPixels;</span><br><span class="line">    mScreenHeight = metrics.heightPixels;    </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 设置弹出框样式</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setStyle</span><span class="params">(@DialogStyle <span class="keyword">int</span> style, @StyleRes <span class="keyword">int</span> theme)</span> </span>&#123;</span><br><span class="line">    mStyle = style;</span><br><span class="line">    <span class="keyword">if</span> (mStyle == STYLE_NO_FRAME || mStyle == STYLE_NO_INPUT) &#123;</span><br><span class="line">        mTheme = android.R.style.Theme_Panel;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (theme != <span class="number">0</span>) &#123; </span><br><span class="line">        mTheme = theme;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h4 id="onCreateView"><a href="#onCreateView" class="headerlink" title="onCreateView"></a>onCreateView</h4><p>在使用 fragment 通常都会重写该方法，用来设置 fragment 的布局。同理，重写该方法也可以设置弹出提示框的布局。所以，之前所设置的参数，都将在这个方法中生成对应的布局 Dialog。</p>
-<p>在 AbsBaseCircleDialog 中重写了该方法</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> View <span class="title">onCreateView</span><span class="params">(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">        View view = createView(getContext(), inflater, container);</span><br><span class="line">        <span class="keyword">return</span> view;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-
-<p>其中 createView 方法为抽象方法，在 BaseCircleDialog 方法才被实现</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> View <span class="title">createView</span><span class="params">(Context context, LayoutInflater inflater, ViewGroup container)</span> </span>&#123;</span><br><span class="line">        mController = <span class="keyword">new</span> Controller(context.getApplicationContext(), mParams, <span class="keyword">this</span>);</span><br><span class="line">        mController.createView();</span><br><span class="line">        View view = mController.getView();</span><br><span class="line">        <span class="keyword">return</span> view;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-
-<p>先不研究 Controller 是什么，根据方法名可以看出其作用是通过生成一个控制器类，然后创建视图并返回。</p>
-<p>这里得到的视图就是最终会显示在页面上的提示框内容。</p>
-<h4 id="onViewCreated"><a href="#onViewCreated" class="headerlink" title="onViewCreated"></a>onViewCreated</h4><p>该生命周期方法是在 onCreateView 后被调用的，方法接收的参数 view 则是在 onCreateView 中所返回的值。此时的 view 已经生成，但没还有完全附着到 Activity 上</p>
-<p>BaseCircleDialog 和 AbsBaseCircleDialog 都重写了该方法，在方法内部主要是保存提示框 Dialog 设置参数（长宽/透明度/背景颜色）。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// BaseCircleDialog</span></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onViewCreated</span><span class="params">(View view, @Nullable Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">        DialogParams dialogParams = mParams.dialogParams;</span><br><span class="line">        setGravity(dialogParams.gravity);</span><br><span class="line">        setCanceledOnTouchOutside(dialogParams.canceledOnTouchOutside);</span><br><span class="line">        setCanceledBack(dialogParams.cancelable);</span><br><span class="line">        setWidth(dialogParams.width);</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">super</span>.onViewCreated(view, savedInstanceState);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// AbsBaseCircleDialog</span></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onViewCreated</span><span class="params">(@NonNull View view, @Nullable Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onViewCreated(view, savedInstanceState);</span><br><span class="line">        CircleDrawable circleDrawable = <span class="keyword">new</span> CircleDrawable(mBackgroundColor, Controller.dp2px(getContext(), mRadius));</span><br><span class="line">        BackgroundHelper.INSTANCE.handleBackground(view, circleDrawable);</span><br><span class="line"></span><br><span class="line">        view.setAlpha(mAlpha);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h4 id="onActivityCreated"><a href="#onActivityCreated" class="headerlink" title="onActivityCreated"></a>onActivityCreated</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// BaseCircleDialog</span></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onActivityCreated</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">super</span>.onActivityCreated(savedInstanceState);</span><br><span class="line">    Dialog dialog = getDialog();</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// DialogFragment</span></span><br><span class="line"> <span class="meta">@Override</span></span><br><span class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onActivityCreated</span><span class="params">(@Nullable Bundle savedInstanceState&#123;</span></span></span><br><span class="line"><span class="function"><span class="params">    ...</span></span></span><br><span class="line"><span class="function"><span class="params">    mDialog.setCancelable(mCancelable)</span></span>;</span><br><span class="line">    mDialog.setOnCancelListener(<span class="keyword">this</span>);</span><br><span class="line">    mDialog.setOnDismissListener(<span class="keyword">this</span>);</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>上述的生命周期方法中，都出现了 dialog，但在之前提及的生命周期中，都没有对 dialog 进行创建。</p>
-<p>直接查看 dialog 在哪里被赋值，在 DialogFragment 发现如下代码</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="meta">@NonNull</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> LayoutInflater <span class="title">onGetLayoutInflater</span><span class="params">(@Nullable Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (!mShowsDialog) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">super</span>.onGetLayoutInflater(savedInstanceState);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        mDialog = onCreateDialog(savedInstanceState);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (mDialog != <span class="keyword">null</span>) &#123;</span><br><span class="line">            setupDialog(mDialog, mStyle);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">return</span> (LayoutInflater) mDialog.getContext().getSystemService(</span><br><span class="line">                    Context.LAYOUT_INFLATER_SERVICE);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> (LayoutInflater) mHost.getContext().getSystemService(</span><br><span class="line">                Context.LAYOUT_INFLATER_SERVICE);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@NonNull</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Dialog <span class="title">onCreateDialog</span><span class="params">(@Nullable Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> Dialog(requireContext(), getTheme());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>代码中的 onGetLayoutInflater 生成了 Dialog 并进行了赋值，最终返回了一个 LayoutInflater 类。在查看源码之后，知道了这个方法返回的 LayoutInflater 类最终作为生命周期方法 onCreateView 的第一个参数。所以现在知道了 Dialog 是在 onCreateView 前就创建好了。</p>
-<p>继续回到 onActivityCreated，这些方法里，对 dialog 设置了事件监听方法和状态保存，也设置了要显示在哪个 Activity  上和提示框的内容视图。在这个方法中，已经完成了能够显示的提示框了</p>
-<h4 id="onStart"><a href="#onStart" class="headerlink" title="onStart"></a>onStart</h4><p>在 onStart 的方法中，就是要将 dialog 显示出来。在 DialogFragment 中的 <code>onstart</code> 执行了这个操作</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onStart</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">super</span>.onStart();</span><br><span class="line">    <span class="keyword">if</span> (mDialog != <span class="keyword">null</span>) &#123;</span><br><span class="line">        mViewDestroyed = <span class="keyword">false</span>;</span><br><span class="line">        mDialog.show();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="Controller"><a href="#Controller" class="headerlink" title="Controller"></a>Controller</h3><p>上面的方法都只是提到了自定义的 Dialog 是如何出现在页面上的，至于 Dialog 的自定义视图则是由以下方法完成。</p>
-<p>Controller 这个类就是控制器，用来进行分发，根据参数不同创建不同的视图。在 <code>createView</code> 方法中有出现这个类，代码如下</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> View <span class="title">createView</span><span class="params">(Context context, LayoutInflater inflater, ViewGroup container)</span> </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    mController = <span class="keyword">new</span> Controller(context.getApplicationContext(), mParams, <span class="keyword">this</span>);</span><br><span class="line">    mController.createView();</span><br><span class="line">    View view = mController.getView();</span><br><span class="line">    <span class="keyword">return</span> view;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>构造函数接受的参数是 context，自定义提示框的参数以及当前 fragment。<code>createView</code> 则是根据参数创建不同的视图的方法。</p>
-<p>先选一个最简单的例子来讲解，当传入的参数中有 <code>inputParams</code> 时，表示要生成的是一个带输入框的提示框。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 输入框</span></span><br><span class="line"><span class="keyword">else</span> <span class="keyword">if</span> (mParams.inputParams != <span class="keyword">null</span>) &#123;</span><br><span class="line">    mCreateView = <span class="keyword">new</span> BuildViewInputImpl(mContext, mParams);</span><br><span class="line">    mCreateView.buildBodyView();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><code>BuildViewInputImpl</code> 是一个继承 AbsBuildView 的类，其中重写了 <code>buildBodyView</code> 的方法</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">buildBodyView</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    buildRootView();</span><br><span class="line">    buildTitleView();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (mBodyInputView == <span class="keyword">null</span>) &#123;</span><br><span class="line">        mBodyInputView = <span class="keyword">new</span> BodyInputView(mContext, mParams.dialogParams, mParams.titleParams,</span><br><span class="line">                mParams.subTitleParams, mParams.inputParams, mParams.inputCounterChangeListener,</span><br><span class="line">                mParams.createInputListener);</span><br><span class="line">        addViewByBody(mBodyInputView.getView());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>在方法中，调用了 <code>buildRootView</code> 和 <code>buildTitleView</code> 方法，顾名思义，就是生成根视图和标题视图，这两个方法是 AbsBuildView 的类中方法。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">buildRootView</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">buildTitleView</span><span class="params">()</span> </span>&#123;&#125;</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>从上述代码可以看到，这两个方法都是 override 的，这是因为 AbsBuildView 实现了BuildView 方法。buildBodyView 也是如此。<br>通过这种方式，约定了每一个自定义视图类都必须实现的方法，最后通过在 Controller 中，直接使用 BuildView 类型来表示自定义视图，这是一种良好的设计。</p>
-</blockquote>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> BuildView mCreateView;</span><br></pre></td></tr></table></figure>
-
-<p>继续回到 <code>buildRootView</code> 方法</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">buildRootView</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    createLinearLayout();</span><br><span class="line">    <span class="keyword">if</span> (Controller.SDK_LOLLIPOP) &#123;</span><br><span class="line">        CardView cardView = createCardView();</span><br><span class="line">        cardView.addView(mRootCardViewByLinearLayout);</span><br><span class="line">        <span class="keyword">if</span> (mParams.closeParams == <span class="keyword">null</span>) &#123;</span><br><span class="line">            mRoot = cardView;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            LinearLayout rootLayout = <span class="keyword">new</span> LinearLayout(mContext);</span><br><span class="line">            rootLayout.setBackgroundColor(Color.TRANSPARENT);</span><br><span class="line">            rootLayout.setOrientation(LinearLayout.VERTICAL);</span><br><span class="line">            rootLayout.addView(cardView);</span><br><span class="line">            mRoot = rootLayout;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        mRoot = mRootCardViewByLinearLayout;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>上述方法就是生成提示框根布局视图，可以看作是布局 xml 文件中，最外层的 LinearLayout，<code>createLinearLayout()</code> 方法生成了一个 LinearLayout，并将其赋值给 <code>mRootCardViewByLinearLayout</code> 变量。</p>
-<p>然后判断当前设备版本，如果大于 5.0，则在 LinearLayout 外包装多一层 CardView，同时，还需要去判断是否有 closeParams 参数，如果有，则需要在 CardView 上再嵌套上一层 LinearLayout。（之所以这么做的原因后续会提到）</p>
-<p>此时，提示框布局的根目录已经确定了，被存储在变量 mRoot 中。 在上面有提到的 Controller.getView() 方法中，返回的就是该布局变量，最终在 Fragment 中被使用。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"> <span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">buildTitleView</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (mParams.titleParams != <span class="keyword">null</span>) &#123;</span><br><span class="line">        mTitleView = <span class="keyword">new</span> TitleView(mContext, mParams.dialogParams, mParams.titleParams, mParams.subTitleParams,</span><br><span class="line">                mParams.createTitleListener);</span><br><span class="line">        mRootCardViewByLinearLayout.addView(mTitleView);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>在 buildTitleView 方法中，就是生成一个 TitleView 并放入到 mRootCardViewByLinearLayout 中，也就是 mRoot；这里的 TitleView 是一个继承 LinearLayout 的类，在里面创建 View 来进行排列。</p>
-<p>同理，buildBodyView 中的 addViewByBody 方法，也就是将新创建的 BodyInputView 类通过 addView 方法添加到 mRoot 中。</p>
-<p>在调用完 buildBodyView 方法后， mRoot 中含有的 View 如图所示</p>
-<p><img src="https://i.imgur.com/mZd7e34.jpg" alt="viewtree"></p>
-<p>此时一个带输入框的视图已经生成完了，在 Controller 的 createView 方法中，在生成完需要的视图后，还会去判断是否要生成关闭按钮和底部按钮</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"> <span class="comment">// 图标x关闭按钮</span></span><br><span class="line"><span class="keyword">if</span> (mParams.closeParams != <span class="keyword">null</span>) &#123;</span><br><span class="line">    CloseView closeView = mCreateView.buildCloseImgView();</span><br><span class="line">    closeView.regOnCloseClickListener(<span class="keyword">new</span> View.OnClickListener() &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClick</span><span class="params">(View v)</span> </span>&#123;</span><br><span class="line">            mOnDialogInternalListener.dialogDismiss();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 底部按钮</span></span><br><span class="line">ButtonView buttonView = mCreateView.buildButton();</span><br><span class="line">regNegativeListener(buttonView);</span><br><span class="line">regNeutralListener(buttonView);</span><br><span class="line"><span class="keyword">if</span> (mParams.inputParams != <span class="keyword">null</span>) &#123;</span><br><span class="line">    InputView inputView = mCreateView.getBodyView();</span><br><span class="line">    <span class="comment">//输入框确定按钮事件特殊性</span></span><br><span class="line">    regPositiveInputListener(buttonView, inputView);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    regPositiveListener(buttonView);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// buildCloseImgView 方法</span></span><br><span class="line"> <span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> CloseView <span class="title">buildCloseImgView</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    CloseParams closeParams = mParams.closeParams;</span><br><span class="line">    CloseImgView closeView = <span class="keyword">new</span> CloseImgView(mContext, closeParams);</span><br><span class="line">    LinearLayout.LayoutParams layoutParamsClose = <span class="keyword">new</span> LinearLayout.LayoutParams(</span><br><span class="line">            LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);</span><br><span class="line">   <span class="keyword">if</span> (closeParams.closeGravity == CloseParams.CLOSE_TOP_LEFT</span><br><span class="line">            || closeParams.closeGravity == CloseParams.CLOSE_TOP_CENTER</span><br><span class="line">            || closeParams.closeGravity == CloseParams.CLOSE_TOP_RIGHT) &#123;</span><br><span class="line">        mRoot.addView(closeView, <span class="number">0</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        mRoot.addView(closeView);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> closeView;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>在该方法中，通过 closeParams 生成了一个 CloseImgView，这是一个继承 LinearLayout 的视图；</p>
-<p>然后新建一个 LinearLayout.layoutparams 类，用来调整这个 CloseImgView 在布局中的位置（这也是为什么前面需要在 CardView 外嵌套一层 LinearLayout 的原因，因为这样才可以使用 LinearLayout.layoutparams 类，CardView 并没有 layoutparams 类）</p>
-<p>在方法中，出现了 <code>mRoot.addView(closeView, 0);</code> 方法，addView 方法接收 2 个参数，一个是要添加的视图 View，另一个是索引 index，可以通过 index 来控制添加的视图在布局中的位置，不传入则按默认顺序，如果是 0 ，则表示添加到顶部，如果是 -1，则放入最底部</p>
-<p>底部按钮的生成方式也是如此，此时完整的输入框已经创建完成，结果如图</p>
-<p><img src="https://i.imgur.com/6Y10AFz.jpg" alt="Imgur"></p>
-<h4 id="LayoutParams"><a href="#LayoutParams" class="headerlink" title="LayoutParams"></a>LayoutParams</h4><p>上面提到的 LayoutParams 的是布局中的一些参数类，它是 ViewGroup 中的一个类，里面包含了高度和宽度的值，最终这个参数会被 <code>View.setLayoutParams</code> 所使用。简单来说，就是可以通过这个类来设置 View 的一些布局参数。</p>
-<p>ViewGroup.LayoutParams 是一个通用的 LayoutParams，可以设置 Height 和 Weight，除此之外，它还有别的子类 ViewGroup.MarginLayoutParams，他还能够设置 margin 的值。</p>
-<p>当然，对于每一个布局，都应该有其特定的 LayoutParams，并且都继承了 LayoutParams 或 MarginLayoutParams。举个例子，想要设定以下布局；TextView 在 LinearLayout 中，设置其布局的属性，那么就应该这么做</p>
-<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 伪代码</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> mLinearLayout = LinearLayout(mContext)</span><br><span class="line"><span class="keyword">val</span> mTextView = TextView(mContext)</span><br><span class="line"><span class="keyword">val</span> layoutParams = LinearLayout.LayoutParams(mTextView.layoutParams)</span><br><span class="line">layoutParams.gravity =Gravity.CENTER</span><br><span class="line">layoutParams.weight = <span class="number">0f</span></span><br><span class="line">layoutParams.setMargins(<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>)</span><br><span class="line">mTextView.layoutParams = layoutParams</span><br><span class="line">mLinearLayout.addView(mTextView)</span><br><span class="line">....</span><br></pre></td></tr></table></figure>
-
-<h3 id="自定义-View-的总结"><a href="#自定义-View-的总结" class="headerlink" title="自定义 View 的总结"></a>自定义 View 的总结</h3><ol>
-<li>最终生成的自定义 View 会在 fragment 的 onCreateView 方法中被添加到提示框中显示</li>
-<li><strong>自定义 View 的过程就相当于使用代码的形式完成 layout 文件功能</strong>，都需要创建一个 ViewGroup 来管理其中的 View 的排版，在上述代码中的 CardView 和 Linearlayout 都是最外层的 ViewGroup，用来管理其中的 View 的布局，而其中的 View，也可以是通过 Linearlayout 等布局视图来组合的 View。</li>
-<li>通过 layoutParams 来调整 View 在 ViewGroup 下的布局，也就相当于在 layout 文件下编写布局约束一样；设置 View 的属性也是如此</li>
-</ol>
-<h2 id="实操"><a href="#实操" class="headerlink" title="实操"></a>实操</h2><p>通过实际的代码来实现一个简单的自定义提示框</p>
-<p>首先在 Activity 中设置按钮监听，弹出对话框</p>
-<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">button.setOnClickListener &#123;</span><br><span class="line">    MyDialog().show(supportFragmentManager,<span class="string">"test"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>其中 MyDialog 继承了 DialogFragment，其代码如下</p>
-<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyDialog</span>:<span class="type">DialogFragment</span></span>() &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 设置 dialog 无标题</span></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onCreate</span><span class="params">(savedInstanceState: <span class="type">Bundle</span>?)</span></span> &#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState)</span><br><span class="line">        setStyle(DialogFragment.STYLE_NO_TITLE, <span class="number">0</span>)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 返回要自定义的视图</span></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onCreateView</span><span class="params">(inflater: <span class="type">LayoutInflater</span>, container: <span class="type">ViewGroup</span>?, savedInstanceState: <span class="type">Bundle</span>?)</span></span>: View? &#123;</span><br><span class="line">        <span class="keyword">return</span> createView(context!!)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 自定义的视图</span></span><br><span class="line">    <span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">createView</span><span class="params">(mContext:<span class="type">Context</span>)</span></span>: View? &#123;</span><br><span class="line">        <span class="keyword">val</span> mRoot = CardView(mContext)</span><br><span class="line">        <span class="keyword">val</span> mLayout = LinearLayout(mContext)</span><br><span class="line">        mLayout.orientation = LinearLayout.VERTICAL</span><br><span class="line">        <span class="keyword">val</span> params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.MATCH_PARENT)</span><br><span class="line">        mLayout.layoutParams =params</span><br><span class="line">        <span class="keyword">val</span> mTitle = TextView(mContext)</span><br><span class="line">        mTitle.text = <span class="string">"自定义提示框"</span></span><br><span class="line">        mLayout.addView(mTitle)</span><br><span class="line">        <span class="keyword">val</span> mButton = Button(mContext)</span><br><span class="line">        mButton.text = <span class="string">"测试"</span></span><br><span class="line">        mButton.setOnClickListener &#123;</span><br><span class="line">            Toast.makeText(mContext,<span class="string">"测试一下"</span>,Toast.LENGTH_LONG).show()</span><br><span class="line">        &#125;</span><br><span class="line">        mLayout.addView(mButton)</span><br><span class="line">        mRoot.addView(mLayout)</span><br><span class="line">        <span class="keyword">return</span> mRoot</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 在 super.onStart() 中有 dialog.show（）,需要在 show 前设置宽高等样式</span></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onStart</span><span class="params">()</span></span> &#123;</span><br><span class="line">        setDialog(dialog)</span><br><span class="line">        <span class="keyword">super</span>.onStart()</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 设置 dialog</span></span><br><span class="line">    <span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">setDialog</span><span class="params">(dialog: <span class="type">Dialog</span>?)</span></span> &#123;</span><br><span class="line">        <span class="keyword">val</span> attr = dialog?.window?.attributes</span><br><span class="line">        attr?.apply &#123;</span><br><span class="line">            width = <span class="number">1000</span></span><br><span class="line">            height = <span class="number">1000</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>实际效果如图</p>
-<p><img src="https://i.imgur.com/Y4R1Zon.jpg" alt="Imgur"><br>一个极其简单的提示框就这么生成了</p>
-<h4 id="结尾"><a href="#结尾" class="headerlink" title="结尾"></a>结尾</h4><p>全部源码看下来也算简单，能够知道作者是如何实现自定义的 View 并且设置 View 的样式，但是自己实际去写代码实现的时候，发现自己忽略了很多细节，比如说需要在 <code>dialog.show（）</code> 方法前去设置样式，否则 dialog 的宽高不会改变；以及在源码中 <code>mRootCardViewByLinearLayout</code> 和 <code>mRoot</code> 的区别，前者是被添加进 mRoot 的 LinearLayout，所以大部分需要被约束的子视图，则都是被添加到 <code>mRootCardViewByLinearLayout</code> 而不是 mRoot，但最终返回的则是 mRoot。</p>
-<p>这是第一次写文，可能有点乱；如果发现有错误，欢迎指正</p>
-<h4 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h4><ol>
-<li><a href="https://www.cnblogs.com/tianzhijiexian/p/4161811.html" target="_blank" rel="noopener">DialogFragment 详解 </a></li>
-<li><a href="https://blog.csdn.net/u012810020/article/details/51970771" target="_blank" rel="noopener">LayoutParams的详解</a></li>
-</ol>
-
-          
+结构CircleDialogCircleDialog 内部结构如图所示。Builder 则是建造者，通过 setXXX 方法来传入D
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2019/08/14/CircleDialog/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1120,9 +800,16 @@
       
         
           
-            <p>测试一下博文样式</p>
-
-          
+          Android Notification 的使用最近在参照着谷歌的官方文档学习 Android Notification 的使用，将这一过程的笔记和问题都记录下来。分享给大家学习。
+NotificationCompat使用 NotificationCompat 类创建的通知，能够向低版本提供兼容性，
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2019/08/14/Notification/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>

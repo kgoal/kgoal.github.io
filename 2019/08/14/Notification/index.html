@@ -79,18 +79,32 @@
 
 
 
-<meta name="description" content="测试一下博文样式">
+<meta name="description" content="Android Notification 的使用最近在参照着谷歌的官方文档学习 Android Notification 的使用，将这一过程的笔记和问题都记录下来。分享给大家学习。 NotificationCompat使用 NotificationCompat 类创建的通知，能够向低版本提供兼容性，所以在后续的教程中，都是使用该类来创建通知。 channel 创建在面向 8.0 以上的系统时，必须">
 <meta name="keywords" content="学习笔记,未完善">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Notification">
 <meta property="og:url" content="http://yoursite.com/2019/08/14/Notification/index.html">
 <meta property="og:site_name" content="Koga">
-<meta property="og:description" content="测试一下博文样式">
+<meta property="og:description" content="Android Notification 的使用最近在参照着谷歌的官方文档学习 Android Notification 的使用，将这一过程的笔记和问题都记录下来。分享给大家学习。 NotificationCompat使用 NotificationCompat 类创建的通知，能够向低版本提供兼容性，所以在后续的教程中，都是使用该类来创建通知。 channel 创建在面向 8.0 以上的系统时，必须">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-08-14T14:24:50.920Z">
+<meta property="og:image" content="https://i.imgur.com/6frez4W.jpg">
+<meta property="og:image" content="https://i.imgur.com/jhb8ksH.jpg">
+<meta property="og:image" content="https://i.imgur.com/DhdrCw9.jpg">
+<meta property="og:image" content="https://i.imgur.com/w0WNwcx.jpg">
+<meta property="og:image" content="https://i.imgur.com/LlTZQHf.jpg">
+<meta property="og:image" content="https://i.imgur.com/n0JjNXL.jpg">
+<meta property="og:image" content="https://i.imgur.com/BQvkGAZ.jpg">
+<meta property="og:image" content="https://i.imgur.com/ssCvfia.jpg">
+<meta property="og:image" content="https://i.imgur.com/jpBkjLW.jpg">
+<meta property="og:image" content="https://i.imgur.com/I0QdrUo.jpg">
+<meta property="og:image" content="https://i.imgur.com/HMzrm8A.jpg">
+<meta property="og:image" content="https://i.imgur.com/AvUXMAU.jpg">
+<meta property="og:image" content="https://i.imgur.com/tfJyGNZ.jpg">
+<meta property="og:updated_time" content="2019-08-29T15:07:18.479Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Notification">
-<meta name="twitter:description" content="测试一下博文样式">
+<meta name="twitter:description" content="Android Notification 的使用最近在参照着谷歌的官方文档学习 Android Notification 的使用，将这一过程的笔记和问题都记录下来。分享给大家学习。 NotificationCompat使用 NotificationCompat 类创建的通知，能够向低版本提供兼容性，所以在后续的教程中，都是使用该类来创建通知。 channel 创建在面向 8.0 以上的系统时，必须">
+<meta name="twitter:image" content="https://i.imgur.com/6frez4W.jpg">
 
 
 
@@ -342,7 +356,210 @@
       
 
       
-        <p>测试一下博文样式</p>
+        <h1 id="Android-Notification-的使用"><a href="#Android-Notification-的使用" class="headerlink" title="Android Notification 的使用"></a>Android Notification 的使用</h1><p>最近在参照着<a href="https://developer.android.google.cn/guide/topics/ui/notifiers/notifications" target="_blank" rel="noopener">谷歌的官方文档</a>学习 Android Notification 的使用，将这一过程的笔记和问题都记录下来。分享给大家学习。</p>
+<h2 id="NotificationCompat"><a href="#NotificationCompat" class="headerlink" title="NotificationCompat"></a>NotificationCompat</h2><p>使用 NotificationCompat 类创建的通知，能够向低版本提供兼容性，所以在后续的教程中，都是使用该类来创建通知。</p>
+<h2 id="channel-创建"><a href="#channel-创建" class="headerlink" title="channel 创建"></a>channel 创建</h2><p>在面向 8.0 以上的系统时，必须要先创建好通知的 channel 才能够发送通知，否则通知将不会显示，设置方法如下</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">if</span> (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.O) &#123;</span><br><span class="line">    <span class="keyword">val</span> channel = NotificationChannel(<span class="string">"test"</span>, <span class="string">"测试用"</span>, NotificationManager.IMPORTANCE_HIGH).apply &#123;</span><br><span class="line">        description = <span class="string">"这只是个测试用的通知分类"</span></span><br><span class="line">        lightColor = R.color.colorAccent</span><br><span class="line">        enableLights(<span class="literal">true</span>)</span><br><span class="line">        enableVibration(<span class="literal">true</span>)</span><br><span class="line">        <span class="comment">// 是否显示小红点</span></span><br><span class="line">        setShowBadge(<span class="literal">true</span>)</span><br><span class="line">        group = <span class="string">"testGroup"</span></span><br><span class="line">    &#125;</span><br><span class="line">    manager.createNotificationChannel(channel)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上述代码中，传入 <code>NotificationChannel</code> 的参数分别是 channel 的 id，名字和通知重要度，名字最终会显示在手机 app 通知设置页面中，而通知重要程度则会影响到一些交互的问题。后面会有所提及。</p>
+<p>还有就是 group，这个是 channel 的分组，可以通过一下代码创建 channel 分组</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.O) &#123;</span><br><span class="line">    manager.createNotificationChannelGroup(NotificationChannelGroup(<span class="string">"testGroup"</span>,<span class="string">"测试组"</span>))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其最终的效果如下</p>
+<p><img src="https://i.imgur.com/6frez4W.jpg" alt="Imgur"></p>
+<p>但需要注意的是，在设置完成后，就不能再对 channel 一些属性进行修改了，例如不能够修改通知的重要程度了；</p>
+<p>而用户是可以在设置页面对该 channel 通知的重要程度进行修改。</p>
+<blockquote>
+<p>Channel 的创建和设置应当在 App 启动时尽可能的早设置，并且创建重复的 channel 不会有所影响。</p>
+</blockquote>
+<h2 id="普通的通知创建"><a href="#普通的通知创建" class="headerlink" title="普通的通知创建"></a>普通的通知创建</h2><p>Notification 采用 Builder 来进行创建，可以通过 set 的方法来设置通知栏的配置。</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">val</span> mNotification = NotificationCompat.Builder(<span class="keyword">this</span>, <span class="string">"test"</span>)</span><br><span class="line">    .setContentTitle(<span class="string">"测试"</span>)</span><br><span class="line">    .setContentText(<span class="string">"hhhhhhhhh"</span>)</span><br><span class="line">    .setPriority(NotificationCompat.PRIORITY_HIGH)</span><br><span class="line">    .setSmallIcon(R.drawable.notification_icon_24dp)</span><br><span class="line">    .build()</span><br><span class="line">manager.notify(NOTIFICATION_ID++, mNotification)</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>Builder 接收的第二个参数是 channel 的 id，表示该消息是通过该 channel 发送的；</li>
+<li><code>setPriority</code> 方法是用于 8.0 以下的系统，其作用相当于 channel 的重要程度；</li>
+<li>创建一个通知，必须要调用 <code>setSmallIcon</code> 方法，否则会报错</li>
+<li>在通知创建完之后，则是通过 manager 进行发送，manager 的代码如下</li>
+</ol>
+<p>该类的获取方式如下</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"> <span class="keyword">private</span> <span class="keyword">val</span> manager <span class="keyword">by</span> lazy &#123;</span><br><span class="line">    NotificationManagerCompat.from(<span class="keyword">this</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>除了上述方法外，也可以使用 <code>context.getSystemService(NOTIFICATION_SERVICE)</code> 拿到 <code>NotificationManager</code> 类进行方法，不过前者的兼容性更高。</p>
+<p>notify 接收的第一个参数是通知的 id，每条通知的 id 都应该不同，如果使用了相同的 id，则会对现有的通知进行覆盖更新。</p>
+<p>最终的实现效果如下 （图来自官方文档）</p>
+<p><img src="https://i.imgur.com/jhb8ksH.jpg" alt="Imgur"></p>
+<p>除了上述的 set 方法外，还提供了以下方法</p>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>setOngoing</td>
+<td>设置通知常驻，这会使得通知无法被用户划动关闭</td>
+</tr>
+<tr>
+<td>setVisibility</td>
+<td>设置锁屏可见性，区别在于锁屏状态下，通知的可见程度</td>
+</tr>
+<tr>
+<td>setCategory</td>
+<td>设置分类，系统会判断该分类的通知是否应该在勿扰模式下显示</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>NotificationManagerCompat 类还提供 areNotificationsEnabled 方法来检查 app 的通知功能是否打开，但不能检查通知的 channel 是否打开。</p>
+</blockquote>
+<h2 id="可进行操作的通知"><a href="#可进行操作的通知" class="headerlink" title="可进行操作的通知"></a>可进行操作的通知</h2><p>可进行操作的通知比较常见，常见的如下：</p>
+<ul>
+<li>点击通知后打开 app 并跳转至指定页面</li>
+<li>点击通知提供的按钮，执行对应的操作</li>
+<li>点击回复按钮，能够在通知中回复消息</li>
+</ul>
+<h3 id="点击跳转页面的通知"><a href="#点击跳转页面的通知" class="headerlink" title="点击跳转页面的通知"></a>点击跳转页面的通知</h3><p>通过 <code>setContentIntent</code> 方法来实现该功能，传入的是一个 PendingIntent；<br>通过 <code>setAutoCancel</code> 来让点击通知后，判断是否清除通知；</p>
+<p>PendingIntent 可以看作是一个待执行的 Intent，其中包含了 Intent 的信息和行为，交给了系统或者其他的应用去执行。</p>
+<blockquote>
+<p><a href="https://juejin.im/post/5be3dc45518825171b2d8f72" target="_blank" rel="noopener">pendingIntent 描述</a></p>
+</blockquote>
+<p>点击跳转页面有两种方式，一种是跳转后 Activity 加入了回退栈，一种是不会，下面先讲讲后者</p>
+<blockquote>
+<p>开发过程中，如果不生效，试试卸载重新安装 app</p>
+</blockquote>
+<h4 id="不加入回退栈"><a href="#不加入回退栈" class="headerlink" title="不加入回退栈"></a>不加入回退栈</h4><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 要执行的 intent</span></span><br><span class="line"><span class="keyword">val</span> intent = Intent(<span class="keyword">this</span>,MainActivity::<span class="class"><span class="keyword">class</span>.<span class="title">java</span>).<span class="title">apply</span> </span>&#123;</span><br><span class="line">    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 放入 pendingIntent 中</span></span><br><span class="line"><span class="keyword">val</span> pendingIntent = PendingIntent.getActivity(<span class="keyword">this</span>, REQUEST_CODE++,intent,<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> mNotification = NotificationCompat.Builder(<span class="keyword">this</span>, <span class="string">"test"</span>)</span><br><span class="line">    ....</span><br><span class="line">    .setContentIntent(pendingIntent)</span><br><span class="line">    .build()</span><br><span class="line"></span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// AndroidManifest 文件</span><br><span class="line"> <span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">"要跳转的 Activity"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:taskAffinity</span>=<span class="string">""</span></span></span><br><span class="line"><span class="tag">&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>上述代码实现的功能就是点击通知后，会跳转到 MainActivity，其中 Intent 可以设置该 Activity 的启动模式。</p>
+<p>并且在 AndroidManifest 修改了 taskAffinity 属性，该属性配合 intent Flag 使用，具体效果查看 Android 启动模式</p>
+<p>通过 PendingIntent.getActivity 方法，并且传入 Intent，能够获得启动 Activity 的 PendingIntent。该方法接收的参数为 context，requestCode, intent, flag.</p>
+<ol>
+<li>其中 requestCode 需要每个 PendingIntent 都不一样，否则会出现覆盖的问题。</li>
+<li>flag 参数是表示 PendingIntent 的一些行为，具体查看 <a href="https://www.jianshu.com/p/97f9f20ab36d" target="_blank" rel="noopener">PendingIntent flag</a></li>
+</ol>
+<h4 id="加入回退栈"><a href="#加入回退栈" class="headerlink" title="加入回退栈"></a>加入回退栈</h4><p>需要在 AndroidManifest 文件中，设置要跳转 Activity 的 <code>parentActivityName</code> 属性</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// AndroidManifest 文件</span><br><span class="line"> <span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">"要跳转的 Activity"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:parentActivityName</span>=<span class="string">".MainActivity"</span></span></span><br><span class="line"><span class="tag">&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>然后在代码中，获取 PendingIntent 的获取方式和上述的不同，是通过任务栈来获得 PendingIntent</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> pendingIntent = TaskStackBuilder.create(<span class="keyword">this</span>).run &#123;</span><br><span class="line">    addNextIntentWithParentStack(intent)</span><br><span class="line">    getPendingIntent(REQUEST_CODE,<span class="number">0</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上述传入的参数和之前的一致，0 表示 PendingIntent 的 Flag。</p>
+<p>此时，在通过通知跳转的 Activity 中按下返回键，就可以去到 MainActivity 中了。</p>
+<p>需要注意的是，如果没有在 xml 文件中写上 parentActivityName，那么不能够保证被添加到回退栈。而且这里设置的是 MainActivity，它是最外层的 Activity，如果是类似于这样的 Activity 层级结构</p>
+<p>MainActivity -&gt; SecondActivity -&gt; 要跳转的 Activity</p>
+<p>并且将 AndroidManifest 文件修改为</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// AndroidManifest 文件</span><br><span class="line"> <span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">"要跳转的 Activity"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:parentActivityName</span>=<span class="string">".SecondActivity"</span></span></span><br><span class="line"><span class="tag">&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>那么就会出现，通过通知跳转到对应的 Activity 后，按下返回键，会回到 SecondActivity，但如果继续按下返回键，则会直接退出 app，而不是到 MainActivity。想要避免，则需要这么做</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">// AndroidManifest 文件</span><br><span class="line"><span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">"要跳转的 Activity"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:parentActivityName</span>=<span class="string">".SecondActivity"</span></span></span><br><span class="line"><span class="tag">&gt;</span></span><br><span class="line">&gt; <span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">"SecondActivity"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:parentActivityName</span>=<span class="string">".MainActivity"</span></span></span><br><span class="line"><span class="tag">&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="附带按钮的通知"><a href="#附带按钮的通知" class="headerlink" title="附带按钮的通知"></a>附带按钮的通知</h3><p>通过 <code>addAction</code> 方法来在通知栏下增加按钮，但是只能够添加 3 个按钮</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> mNotification = NotificationCompat.Builder(<span class="keyword">this</span>, <span class="string">"test"</span>)</span><br><span class="line">    ....</span><br><span class="line">    .addAction(<span class="number">0</span>,<span class="string">"测试按钮"</span>,pendingIntent)</span><br><span class="line">    .build()</span><br></pre></td></tr></table></figure>
+
+<p>该方法接收的参数是 icon，title 和 pendingIntent；其中 icon 在 API23 后不再显示，title 则是按钮的名字，pendingIntent 则是点击后要执行的操作。</p>
+<p>PendingIntent 的获得方式和上面所提到的一致，下述代码实现的是点击按钮后，进入到广播接收器进行处理。</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> actionIntent = Intent(<span class="keyword">this</span>, MyBroadcast::<span class="class"><span class="keyword">class</span>.<span class="title">java</span>).<span class="title">apply</span> </span>&#123;</span><br><span class="line">    action = TEST_ACTION</span><br><span class="line">    putExtra(<span class="string">"test"</span>, <span class="string">"我收到了"</span>)</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">val</span> actionPending = PendingIntent.getBroadcast(<span class="keyword">this</span>, REQUEST_CODE++, actionIntent, <span class="number">0</span>)</span><br></pre></td></tr></table></figure>
+
+<p>广播接收器代码</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyBroadcast</span> : <span class="type">BroadcastReceiver</span></span>() &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onReceive</span><span class="params">(context: <span class="type">Context</span>?, intent: <span class="type">Intent</span>?)</span></span> &#123;</span><br><span class="line">        intent?.getStringExtra(<span class="string">"test"</span>)?.let &#123;</span><br><span class="line">            context?.toast(it)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样，在点击按钮后，就可以弹出 toast 显示文字</p>
+<p><img src="https://i.imgur.com/DhdrCw9.jpg" alt="Imgur"></p>
+<h3 id="可以回复消息的通知"><a href="#可以回复消息的通知" class="headerlink" title="可以回复消息的通知"></a>可以回复消息的通知</h3><p>该通知能够做到点击回复按钮，在通知中显示输入框，并且能够将输入的消息发送出去。</p>
+<p>同样的，也是通过为通知添加 action 来实现这个功能，与上面不同的是，还需要调用 <code>addRemoteInput</code> 方法来对 action 进行设置</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> input = RemoteInput.Builder(<span class="string">"测试返回按钮"</span>)</span><br><span class="line">    .setLabel(<span class="string">"测试一下"</span>)</span><br><span class="line">    .build()</span><br><span class="line"></span><br><span class="line"><span class="comment">// 这里传入的 Flag 是为了能够让 PendingIntent 切换不同的 Intent 使用</span></span><br><span class="line"><span class="keyword">val</span> inputIntent = PendingIntent.getBroadcast(<span class="keyword">this</span>, REQUEST_CODE++, Intent(<span class="keyword">this</span>, MyBroadcast::<span class="class"><span class="keyword">class</span>.<span class="title">java</span>).<span class="title">apply</span> </span>&#123;</span><br><span class="line">    action = TEST_ACTION</span><br><span class="line">    putExtra(<span class="string">"reply"</span>, <span class="string">"我收到了"</span>)</span><br><span class="line">&#125;, PendingIntent.FLAG_UPDATE_CURRENT)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> action = NotificationCompat.Action.Builder(<span class="number">0</span>, <span class="string">"回复"</span>, inputIntent).addRemoteInput(input).build()</span><br><span class="line"><span class="keyword">val</span> mNotification = NotificationCompat.Builder(<span class="keyword">this</span>, <span class="string">"test"</span>)</span><br><span class="line">    ...</span><br><span class="line">    .addAction(action)</span><br><span class="line">    .build()</span><br><span class="line">manager.notify(NOTIFICATION_ID, mNotification)</span><br></pre></td></tr></table></figure>
+
+<p>从代码就可以看出，想要添加输入框，只需要传入 RemoterInput 参数即可，其创建方式也是通过创建者模式来创建。</p>
+<p>这样就可以直接在通知的输入框中填写信息进行回复，填写的消息最终可以在 BroadcastReceiver 中拿到</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onReceive</span><span class="params">(context: <span class="type">Context</span>?, intent: <span class="type">Intent</span>?)</span></span> &#123;</span><br><span class="line">    intent?.getStringExtra(<span class="string">"reply"</span>)?.let &#123;</span><br><span class="line">        getMessageText(intent)?.let &#123;</span><br><span class="line">            context?.apply &#123;</span><br><span class="line">                toast(it)</span><br><span class="line">                <span class="keyword">val</span> mNotification = NotificationCompat.Builder(<span class="keyword">this</span>, <span class="string">"Test"</span>)</span><br><span class="line">                    .setContentTitle(<span class="string">"发送成功"</span>)</span><br><span class="line">                    .setContentText(<span class="string">"发送成功:<span class="variable">$it</span>"</span>)</span><br><span class="line">                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)</span><br><span class="line">                    .setSmallIcon(R.drawable.notification_icon_24dp)</span><br><span class="line">                    .build()</span><br><span class="line">                NotificationManagerCompat.from(<span class="keyword">this</span>).notify(<span class="number">1</span>, mNotification)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i.imgur.com/w0WNwcx.jpg" alt="Imgur"></p>
+<h2 id="Android-自带的通知样式"><a href="#Android-自带的通知样式" class="headerlink" title="Android 自带的通知样式"></a>Android 自带的通知样式</h2><h3 id="进度条通知"><a href="#进度条通知" class="headerlink" title="进度条通知"></a>进度条通知</h3><ol>
+<li>相对于操作来说更加的方便，只需要在 NotificationCompat.Builder 方法中调用 <code>setProgress(progressMax, progress, false)</code> 即可。第一个参数表示进度最大值，第二个是当前进度，第三个表示该进度是否是假的。</li>
+<li>然后只需要在后续重复调用该方法，传入的 progress 改变，那么进度条也会随之改变。</li>
+<li>最后，在进度完成时，继续调用该方法，不过将 progress 和 progressMax 都等于0，这样进度条就会消失。（所以这时候可以设置 SetContentText 提示用户下载完成）</li>
+<li>如果第三个参数是 true 时，进度条会不停的动，想要在进度完成后，关闭进度条，需要按照上述的停止方法并且将参数设置为 false</li>
+<li>在进度条存在时，ContentText 的位置会被移动至进度条的右上角，所以可以用来做进度百分比显示</li>
+</ol>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> progress = <span class="number">0</span></span><br><span class="line"><span class="keyword">val</span> progressMax = <span class="number">100</span></span><br><span class="line"><span class="keyword">val</span> mNotification = NotificationCompat.Builder(<span class="keyword">this</span>, <span class="string">"test"</span>)</span><br><span class="line">    .setSmallIcon(R.drawable.notification_icon_24dp)</span><br><span class="line">    .setContentText(<span class="string">"<span class="variable">$progress</span> %"</span>)</span><br><span class="line">    .setContentTitle(<span class="string">"任务下载"</span>)</span><br><span class="line">    .setOngoing(<span class="literal">true</span>)</span><br><span class="line">    .setProgress(progressMax, progress, <span class="literal">false</span>)</span><br><span class="line">manager.notify(NOTIFICATION_ID, mNotification.build())</span><br><span class="line"></span><br><span class="line"><span class="comment">// 另一个线程中的任务，持续更新通知</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> (progress &lt;= <span class="number">100</span>) &#123;</span><br><span class="line">    println(Thread.currentThread())</span><br><span class="line">    println(progress)</span><br><span class="line">    manager.notify(</span><br><span class="line">        NOTIFICATION_ID,</span><br><span class="line">        mNotification.setProgress(progressMax, progress, <span class="literal">false</span>)</span><br><span class="line">            .setContentText(<span class="string">"<span class="variable">$progress</span> %"</span>)</span><br><span class="line">            .build()</span><br><span class="line">    )</span><br><span class="line">    progress += <span class="number">10</span></span><br><span class="line">    Thread.sleep(<span class="number">1000</span>)</span><br><span class="line">&#125;</span><br><span class="line">manager.notify(NOTIFICATION_ID, mNotification.setContentText(<span class="string">"下载完成"</span>).setOngoing(<span class="literal">false</span>).setProgress(<span class="number">0</span>, <span class="number">0</span>, <span class="literal">false</span>).build())</span><br></pre></td></tr></table></figure>
+
+<p>下载中</p>
+<p><img src="https://i.imgur.com/LlTZQHf.jpg" alt="Imgur"></p>
+<p>下载完成</p>
+<p><img src="https://i.imgur.com/n0JjNXL.jpg" alt="Imgur"></p>
+<h4 id="消息样式"><a href="#消息样式" class="headerlink" title="消息样式"></a>消息样式</h4><p>这个样式是聊天应用可能会使用到的样式</p>
+<p>代码如下</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"> <span class="keyword">val</span> it = Person.Builder().setName(<span class="string">"it"</span>).build()</span><br><span class="line"><span class="keyword">val</span> man = Person.Builder().setName(<span class="string">"he"</span>).build()</span><br><span class="line"><span class="keyword">val</span> women = Person.Builder().setName(<span class="string">"she"</span>).build()</span><br><span class="line"><span class="keyword">val</span> me = Person.Builder().setName(<span class="string">"me"</span>).setBot(<span class="literal">true</span>).build()</span><br><span class="line"><span class="keyword">val</span> mNotification = NotificationCompat.Builder(<span class="keyword">this</span>, <span class="string">"test"</span>)</span><br><span class="line">    .setPriority(NotificationCompat.PRIORITY_DEFAULT)</span><br><span class="line">    .setSmallIcon(R.drawable.notification_icon_24dp)</span><br><span class="line">    .setStyle(</span><br><span class="line">        NotificationCompat.MessagingStyle(me).setConversationTitle(<span class="string">"team lunch"</span>)</span><br><span class="line">            .addMessage(</span><br><span class="line">                <span class="string">"hi"</span>,</span><br><span class="line">                <span class="number">1564621415</span>,</span><br><span class="line">                it</span><br><span class="line">            )</span><br><span class="line">            .addMessage(<span class="string">"fk"</span>, <span class="number">1564621315</span>, man)</span><br><span class="line">            .addMessage(<span class="string">"???"</span>, <span class="number">1564621316</span>, women)</span><br><span class="line">            .addMessage(<span class="string">"...."</span>, <span class="number">1564621316</span>, me)</span><br><span class="line">            .setGroupConversation(<span class="literal">true</span>)</span><br><span class="line">    ).build()</span><br><span class="line">manager.notify(<span class="number">2</span>, mNotification)</span><br></pre></td></tr></table></figure>
+
+<p>其中有使用到一个类， Person ，可以使用这一个类去标识一个用户，该类会保存其信息（username，uri，包括邮箱/电话，是否为 bot，头像之类的）</p>
+<p><img src="https://i.imgur.com/BQvkGAZ.jpg" alt="Imgur"></p>
+<h4 id="LargeImageStyle"><a href="#LargeImageStyle" class="headerlink" title="LargeImageStyle"></a>LargeImageStyle</h4><p>这种样式用来显示通知栏的大图，是一个折叠样式的通知栏，展开状态显示大图，收缩状态不显示。</p>
+<p>通过这个样式，可以做到在展开的同时更换标题。</p>
+<p>除此之外，如果想要收缩时在右侧显示图片的小图，展开后小图消失，需要使用 setLargeIcon() 和 bigLargeIcon() 配合使用。前者参数是要显示的图片，后者参数是 null，这样就能在展开是不现实 Icon</p>
+<p>代码如下</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> mNotification = NotificationCompat.Builder(<span class="keyword">this</span>, <span class="string">"test"</span>)</span><br><span class="line">    .setContentTitle(<span class="string">"测试"</span>)</span><br><span class="line">    .setContentText(<span class="string">"hhhhhhhhh"</span>)</span><br><span class="line">    .setPriority(NotificationCompat.PRIORITY_DEFAULT)</span><br><span class="line">    .setSmallIcon(R.drawable.notification_icon_24dp)</span><br><span class="line">    .setLargeIcon(pic)</span><br><span class="line">    .setStyle(NotificationCompat.BigPictureStyle().run &#123;</span><br><span class="line">        setBigContentTitle(<span class="string">"测试大图"</span>)</span><br><span class="line">        bigPicture(pic).bigLargeIcon(<span class="literal">null</span>)</span><br><span class="line">        setSummaryText(<span class="string">"Android"</span>)</span><br><span class="line">    &#125;)</span><br><span class="line">    .build()</span><br><span class="line">manager.notify(NOTIFICATION_ID, mNotification)</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i.imgur.com/ssCvfia.jpg" alt="Imgur"></p>
+<p>除了图片之外，还有 inBoxStyle 和 bigTextStyle ,用法相似</p>
+<h3 id="音乐播放器样式的通知"><a href="#音乐播放器样式的通知" class="headerlink" title="音乐播放器样式的通知"></a>音乐播放器样式的通知</h3><p>在使用前，需要导入 <code>androidx.media:media:1.0.1</code> 包，并且导入时使用别名</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> androidx.media.app.NotificationCompat <span class="keyword">as</span> MediaNotificationCompat</span><br></pre></td></tr></table></figure>
+
+<p>其使用方式和上述的 style 差不多，不过使用的是 <code>androidx.media.app.NotificationCompat.MediaStyle</code>,也就是导入的包中的类。</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 创建播放器的通知</span></span><br><span class="line"><span class="keyword">val</span> mNotification = NotificationCompat.Builder(<span class="keyword">this</span>, <span class="string">"test"</span>)</span><br><span class="line">    .setContentTitle(<span class="string">"测试"</span>)</span><br><span class="line">    .setContentText(<span class="string">"hhhhhhhhh"</span>)</span><br><span class="line">    .setLargeIcon(pic)</span><br><span class="line">    .setPriority(NotificationCompat.PRIORITY_DEFAULT)</span><br><span class="line">    .setSmallIcon(R.drawable.notification_icon_24dp)</span><br><span class="line">    .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)</span><br><span class="line">    .also &#123; addMusicAction(it) &#125;</span><br><span class="line">    .setStyle(MediaNotificationCompat.MediaStyle().run &#123;</span><br><span class="line">        setShowActionsInCompactView(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span> <span class="comment">/* #1: pause button \*/</span>)</span><br><span class="line">    &#125;)</span><br><span class="line">    .setOngoing(<span class="literal">true</span>)</span><br><span class="line">    .build()</span><br><span class="line">manager.notify(NOTIFICATION_ID, mNotification)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 设置播放器的按钮</span></span><br><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">addMusicAction</span><span class="params">(mBuilder: <span class="type">NotificationCompat</span>.<span class="type">Builder</span>)</span></span>: NotificationCompat.Builder? &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">val</span> actionIntent0 = Intent(<span class="keyword">this</span>, MyBroadcast::<span class="class"><span class="keyword">class</span>.<span class="title">java</span>).<span class="title">apply</span> </span>&#123;</span><br><span class="line">        action = TEST_ACTION</span><br><span class="line">        putExtra(<span class="string">"test"</span>, <span class="string">"Down"</span>)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">val</span> actionIntent1 = Intent(<span class="keyword">this</span>, MyBroadcast::<span class="class"><span class="keyword">class</span>.<span class="title">java</span>).<span class="title">apply</span> </span>&#123;</span><br><span class="line">        action = TEST_ACTION</span><br><span class="line">        putExtra(<span class="string">"test"</span>, <span class="string">"上一首"</span>)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">val</span> actionIntent2 = Intent(<span class="keyword">this</span>, MyBroadcast::<span class="class"><span class="keyword">class</span>.<span class="title">java</span>).<span class="title">apply</span> </span>&#123;</span><br><span class="line">        action = TEST_ACTION</span><br><span class="line">        putExtra(<span class="string">"test"</span>, <span class="string">"播放/暂停"</span>)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">val</span> actionIntent3 = Intent(<span class="keyword">this</span>, MyBroadcast::<span class="class"><span class="keyword">class</span>.<span class="title">java</span>).<span class="title">apply</span> </span>&#123;</span><br><span class="line">        action = TEST_ACTION</span><br><span class="line">        putExtra(<span class="string">"test"</span>, <span class="string">"下一首"</span>)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">val</span> actionIntent4 = Intent(<span class="keyword">this</span>, MyBroadcast::<span class="class"><span class="keyword">class</span>.<span class="title">java</span>).<span class="title">apply</span> </span>&#123;</span><br><span class="line">        action = TEST_ACTION</span><br><span class="line">        putExtra(<span class="string">"test"</span>, <span class="string">"UP"</span>)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">val</span> actionPending0 = PendingIntent.getBroadcast(<span class="keyword">this</span>, REQUEST_CODE++, actionIntent0, <span class="number">0</span>)</span><br><span class="line">    <span class="keyword">val</span> actionPending1 = PendingIntent.getBroadcast(<span class="keyword">this</span>, REQUEST_CODE++, actionIntent1, <span class="number">0</span>)</span><br><span class="line">    <span class="keyword">val</span> actionPending2 = PendingIntent.getBroadcast(<span class="keyword">this</span>, REQUEST_CODE++, actionIntent2, <span class="number">0</span>)</span><br><span class="line">    <span class="keyword">val</span> actionPending3 = PendingIntent.getBroadcast(<span class="keyword">this</span>, REQUEST_CODE++, actionIntent3, <span class="number">0</span>)</span><br><span class="line">    <span class="keyword">val</span> actionPending4 = PendingIntent.getBroadcast(<span class="keyword">this</span>, REQUEST_CODE++, actionIntent4, <span class="number">0</span>)</span><br><span class="line">    <span class="keyword">return</span> mBuilder</span><br><span class="line">        .addAction(R.drawable.ic_trending_down_black_24dp,<span class="string">"Down"</span>,actionPending0)</span><br><span class="line">        .addAction(R.drawable.ic_skip_previous_black_24dp,<span class="string">"Previous"</span>,actionPending1)</span><br><span class="line">        .addAction(R.drawable.ic_slideshow_black_24dp,<span class="string">"Pause"</span>,actionPending2)</span><br><span class="line">        .addAction(R.drawable.ic_skip_next_black_24dp,<span class="string">"Next"</span>,actionPending3)</span><br><span class="line">        .addAction(R.drawable.ic_trending_up_black_24dp,<span class="string">"Up"</span>,actionPending4)</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个样式中，总共可以添加 5 个 Action 按钮，在通知在展开是会显示 5 个，可以通过<br><code>setShowActionsInCompactView</code> 方法，来设置在收缩时显示的按钮（接收的是 int 多参数，按着按钮的顺序传入数字，从 0 开始）</p>
+<p>通知收缩时</p>
+<p><img src="https://i.imgur.com/jpBkjLW.jpg" alt="Imgur"></p>
+<p>通知展开时</p>
+<p><img src="https://i.imgur.com/I0QdrUo.jpg" alt="Imgur"></p>
+<h3 id="自定义通知"><a href="#自定义通知" class="headerlink" title="自定义通知"></a>自定义通知</h3><p>定义 View 的也有两种形式，一种是保留了 Android 的头部（时间/app name）以及 icon；另一种则是不保留（官方不推荐，可能会导致在不同设备显示效果不同）</p>
+<p>先说下第二种，就是直接通过 <code>setCustomBigContentView</code> 方法传入 RemoteViews 直接设定，并且如果需要适配低版本，也要设置 <code>setContent</code> 方法，传入相同的 RemoteViews。</p>
+<p>第一种则是在先调用 <code>setStyle(NotificationCompat.DecoratedCustomViewStyle())</code> 方法，之后在调用 <code>setCustomBigContentView</code>，<code>setCustomContentView</code>，<code>setCustomHeadsUpContentView</code> 方法，即可自定义页面。第一个是展开后的通知页面，第二个是收缩的通知页面，第三个是悬挂式展示的通知页面。不需要用到 <code>setContent</code> 方法。</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 非展开时</span></span><br><span class="line"><span class="keyword">val</span> view1 = RemoteViews(packageName,R.layout.notification_small)</span><br><span class="line"><span class="comment">// 展开</span></span><br><span class="line"><span class="keyword">val</span> view2 = RemoteViews(packageName,R.layout.notification_expand)</span><br><span class="line"><span class="comment">// 悬挂时</span></span><br><span class="line"><span class="keyword">val</span> view3 = RemoteViews(packageName,R.layout.notification_head)</span><br><span class="line"><span class="keyword">val</span> mNotification = NotificationCompat.Builder(<span class="keyword">this</span>, <span class="string">"test"</span>)</span><br><span class="line">    .setPriority(NotificationCompat.PRIORITY_MAX)</span><br><span class="line">    .setSmallIcon(R.drawable.notification_icon_24dp)</span><br><span class="line">    .setStyle(NotificationCompat.DecoratedCustomViewStyle())</span><br><span class="line">    .setCustomContentView(view1)</span><br><span class="line">    .setCustomBigContentView(view2)</span><br><span class="line">    .setCustomHeadsUpContentView(view3)</span><br><span class="line">    .build()</span><br><span class="line">manager.notify(NOTIFICATION_ID, mNotification)</span><br><span class="line">``</span><br><span class="line"></span><br><span class="line">需要注意的是，如果展开后的页面太小，通知会把全部页面都设置为展开后的页面。</span><br><span class="line"></span><br><span class="line">```xml</span><br><span class="line">&lt;?xml version=<span class="string">"1.0"</span> encoding=<span class="string">"utf-8"</span>?&gt;</span><br><span class="line">&lt;LinearLayout</span><br><span class="line">        xmlns:android=<span class="string">"http://schemas.android.com/apk/res/android"</span></span><br><span class="line">        android:layout_width=<span class="string">"match_parent"</span></span><br><span class="line">        android:layout_height=<span class="string">"match_parent"</span></span><br><span class="line">        android:orientation=<span class="string">"vertical"</span></span><br><span class="line">&gt;</span><br><span class="line">    &lt;TextView android:layout_width=<span class="string">"wrap_content"</span></span><br><span class="line">              android:layout_height=<span class="string">"wrap_content"</span></span><br><span class="line">              android:text=<span class="string">"456"</span></span><br><span class="line">              style=<span class="string">"@style/TextAppearance.Compat.Notification.Title"</span></span><br><span class="line">    /&gt;</span><br><span class="line">    &lt;TextView android:layout_width=<span class="string">"wrap_content"</span></span><br><span class="line">              android:layout_height=<span class="string">"wrap_content"</span></span><br><span class="line">              android:text=<span class="string">"expand"</span></span><br><span class="line">              style=<span class="string">"@style/TextAppearance.Compat.Notification.Info"</span></span><br><span class="line">    /&gt;</span><br><span class="line">&lt;/LinearLayout&gt;</span><br></pre></td></tr></table></figure>
+
+<p>如上述布局，只添加了标题和文字，让其作为展开后的页面，会导致所有的通知页面都是这个页面。<br>其他的设置无效。</p>
+<blockquote>
+<p>这里的 style 是用于设置样式的，能够根据系统的通知样式来设置</p>
+</blockquote>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"> <span class="tag">&lt;<span class="name">ImageView</span> <span class="attr">android:layout_width</span>=<span class="string">"200dp"</span> <span class="attr">android:layout_height</span>=<span class="string">"200dp"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:src</span>=<span class="string">"@color/colorAccent"</span></span></span><br><span class="line"><span class="tag">/&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>只需要增加展开页面的大小，就可以避免这个问题。</p>
+<p>通知展开时</p>
+<p><img src="https://i.imgur.com/HMzrm8A.jpg" alt="Imgur"></p>
+<p>通知非展开时</p>
+<p><img src="https://i.imgur.com/AvUXMAU.jpg" alt="Imgur"></p>
+<blockquote>
+<p>上述代码存在一个问题： setCustomHeadsUpContentView 方法设置的视图会导致 setCustomContentView 方法设置无效，导致非展开时，使用的是 setCustomHeadsUpContentView 提供的视图</p>
+</blockquote>
+<h2 id="悬挂式"><a href="#悬挂式" class="headerlink" title="悬挂式"></a>悬挂式</h2><p>上面有提到的悬挂式通知，其效果如下，通知会直接显示在页面上</p>
+<p><img src="https://i.imgur.com/tfJyGNZ.jpg" alt="Imgur"></p>
+<p>悬挂式通知有两种，一种会自动缩起，一种会一直停留在页面上。推荐使用第一种。</p>
+<p>第一种的用法很简单，只需要将 setPriority 中的优先级参数设置为高于 PRIORITY_DEFAULT ，以及对应的 channel 的重要程度，也设置高于 <code>IMPORTANCE_DEFAULT</code>。</p>
+<p>这样通知就可以<strong>短暂</strong>的悬挂显示在屏幕上。</p>
+<p>可能由于是 Android 系统的原因，不能频繁的发送悬挂式通知，需要过段时间，才能够再发送弹出的通知</p>
+<p>第二种则是通过 setFullScreenIntent() 来设置，接收两个参数，第一个位 pendingIntent，用于点击后的操作，理论上和 setContentIntent 一致；第二个参数是 highpriority ，布尔值,用于决定在当前页面上已经有悬挂式通知时，是否还显示该通知。</p>
+<p>这种方式生成的通知，不会自动缩起，会一直在显示着，并且，传入的 intent 还有可能会自动执行。</p>
+<blockquote>
+<p>问题描述： 在第一次发送该通知后，如果点击执行了这个 intent，后续的通知，都会直接去执行，而不再是弹出悬挂式通知。<br>问题原因分析（未检验过）：由于只是 demo，使用的 intent 和消息 id 是一样的，所以导致判断是同一条消息。从而自动执行</p>
+</blockquote>
+<h2 id="消息分组"><a href="#消息分组" class="headerlink" title="消息分组"></a>消息分组</h2><ol>
+<li>按照官方文档的说法，在 Android 7.0 以上系统，调用 setGroup 方法即可，相同组的消息就会被整合一起。但是结果并不是这样，有些时候还是需要设置 setGroupSummary 才能够完成效果。</li>
+<li>就算达到效果后，也是很多坑，具体查看下方链接</li>
+</ol>
+<p><a href="https://blog.danlew.net/2017/02/07/correctly-handling-bundled-android-notifications/" target="_blank" rel="noopener">消息分组的问题和解决</a></p>
+<h2 id="todo"><a href="#todo" class="headerlink" title="todo"></a>todo</h2><ol>
+<li>通知的内部实现是如何实现的</li>
+<li>PendingIntent 的内部实现</li>
+<li>残留的两个问题</li>
+<li>消息分组的实现</li>
+</ol>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ol>
+<li><a href="https://juejin.im/post/5a6d488851882573315c9d49#heading-17" target="_blank" rel="noopener">底部评论</a></li>
+<li><a href="https://developer.android.com/guide/topics/ui/notifiers/notifications.html?hl=zh-cn" target="_blank" rel="noopener">通知详解</a></li>
+<li><a href="https://juejin.im/post/5be3dc45518825171b2d8f72" target="_blank" rel="noopener">pendingIntent 描述</a></li>
+<li><a href="https://www.jianshu.com/p/97f9f20ab36d" target="_blank" rel="noopener">PendingIntent flag</a></li>
+</ol>
 
       
     </div>
@@ -435,8 +652,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -496,6 +722,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Android-Notification-的使用"><span class="nav-number">1.</span> <span class="nav-text">Android Notification 的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#NotificationCompat"><span class="nav-number">1.1.</span> <span class="nav-text">NotificationCompat</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#channel-创建"><span class="nav-number">1.2.</span> <span class="nav-text">channel 创建</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#普通的通知创建"><span class="nav-number">1.3.</span> <span class="nav-text">普通的通知创建</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#可进行操作的通知"><span class="nav-number">1.4.</span> <span class="nav-text">可进行操作的通知</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#点击跳转页面的通知"><span class="nav-number">1.4.1.</span> <span class="nav-text">点击跳转页面的通知</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#不加入回退栈"><span class="nav-number">1.4.1.1.</span> <span class="nav-text">不加入回退栈</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#加入回退栈"><span class="nav-number">1.4.1.2.</span> <span class="nav-text">加入回退栈</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#附带按钮的通知"><span class="nav-number">1.4.2.</span> <span class="nav-text">附带按钮的通知</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#可以回复消息的通知"><span class="nav-number">1.4.3.</span> <span class="nav-text">可以回复消息的通知</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Android-自带的通知样式"><span class="nav-number">1.5.</span> <span class="nav-text">Android 自带的通知样式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#进度条通知"><span class="nav-number">1.5.1.</span> <span class="nav-text">进度条通知</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#消息样式"><span class="nav-number">1.5.1.1.</span> <span class="nav-text">消息样式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#LargeImageStyle"><span class="nav-number">1.5.1.2.</span> <span class="nav-text">LargeImageStyle</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#音乐播放器样式的通知"><span class="nav-number">1.5.2.</span> <span class="nav-text">音乐播放器样式的通知</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#自定义通知"><span class="nav-number">1.5.3.</span> <span class="nav-text">自定义通知</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#悬挂式"><span class="nav-number">1.6.</span> <span class="nav-text">悬挂式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#消息分组"><span class="nav-number">1.7.</span> <span class="nav-text">消息分组</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#todo"><span class="nav-number">1.8.</span> <span class="nav-text">todo</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">1.9.</span> <span class="nav-text">参考</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
