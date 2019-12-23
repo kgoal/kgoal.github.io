@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="学习笔记,未完善,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="APP 启动后，默认在以包名命名的进程中，而开启多进程则是在 AndroidManifest 文件中，为四大组件指定 android:process 属性来开启 123&amp;lt;activity    android:name=&quot;.SecondActivity&quot;    android:process=&quot;:remote&quot; /&amp;gt;  对于 : 表示的意义是，该进程的名字是 包名:remote，并且该">
+<meta name="keywords" content="学习笔记,未完善">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android 多进程">
+<meta property="og:url" content="http://yoursite.com/2019/12/23/Android多进程/index.html">
+<meta property="og:site_name" content="Koga">
+<meta property="og:description" content="APP 启动后，默认在以包名命名的进程中，而开启多进程则是在 AndroidManifest 文件中，为四大组件指定 android:process 属性来开启 123&amp;lt;activity    android:name=&quot;.SecondActivity&quot;    android:process=&quot;:remote&quot; /&amp;gt;  对于 : 表示的意义是，该进程的名字是 包名:remote，并且该">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://i.imgur.com/r4ji8CK.jpg">
+<meta property="og:image" content="https://i.imgur.com/GY13aCs.jpg">
+<meta property="og:image" content="https://i.imgur.com/UU2Kp3U.jpg">
+<meta property="og:updated_time" content="2019-12-23T01:37:47.396Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android 多进程">
+<meta name="twitter:description" content="APP 启动后，默认在以包名命名的进程中，而开启多进程则是在 AndroidManifest 文件中，为四大组件指定 android:process 属性来开启 123&amp;lt;activity    android:name=&quot;.SecondActivity&quot;    android:process=&quot;:remote&quot; /&amp;gt;  对于 : 表示的意义是，该进程的名字是 包名:remote，并且该">
+<meta name="twitter:image" content="https://i.imgur.com/r4ji8CK.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/12/23/Android多进程/">
+
+
+
+
+
+  <title>Android 多进程 | Koga</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Koga</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/12/23/Android多进程/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Koga Leung">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Koga">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Android 多进程</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-23T09:28:45+08:00">
+                2019-12-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>APP 启动后，默认在以包名命名的进程中，而开启多进程则是在 <code>AndroidManifest</code> 文件中，为四大组件指定 <code>android:process</code> 属性来开启</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">activity</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:name</span>=<span class="string">".SecondActivity"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:process</span>=<span class="string">":remote"</span> /&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>对于 <code>:</code> 表示的意义是，该进程的名字是 <code>包名:remote</code>，并且该进程为该应用的私有进程，无法被其他应用所使用。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">activity</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:name</span>=<span class="string">".SecondActivity"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:process</span>=<span class="string">"com.koga.test.remote"</span> /&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>上述例子的进程名则是 <code>com.koga.test.remote</code>，并且该进程可以被其他应用使用</p>
+<p>开启了多进程之后，会出现如下问题</p>
+<p><img src="https://i.imgur.com/r4ji8CK.jpg" alt="-w351"></p>
+<p>而且由于两个不同的进程，所以无法直接通过内存的方式来共享数据，所以才需要进程间通信这一功能</p>
+<h3 id="序列化"><a href="#序列化" class="headerlink" title="序列化"></a>序列化</h3><p>序列化有两种方式，分别是实现 <code>Serializable</code> 和 <code>Parcelable</code> 接口，前者是 Java 提供的序列化接口，后者则是谷歌提供的。</p>
+<p>前者的实现方式只需要实现 <code>Serializable</code> 接口即可，然后使用 <code>ObjectOutputStream</code> 和 <code>ObjectInputStream</code> 类来实现对象的序列化和反序列化。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 序列化</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String FILE_NAME = <span class="string">"/test"</span>;</span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">persistToFile</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 避免主线程执行耗时操作</span></span><br><span class="line">    <span class="keyword">new</span> Thread(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            LoginModel data = <span class="keyword">new</span> LoginModel(<span class="string">"123"</span>);</span><br><span class="line">            File path =getExternalCacheDir();</span><br><span class="line">            <span class="keyword">if</span> (path == <span class="keyword">null</span>)&#123;</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            File dir = <span class="keyword">new</span> File(path.getPath() + FILE_NAME);</span><br><span class="line">            <span class="keyword">if</span> (!dir.exists())&#123;</span><br><span class="line">                dir.createNewFile();</span><br><span class="line">            &#125;</span><br><span class="line">            ObjectOutputStream opS = <span class="keyword">null</span>;</span><br><span class="line">            opS = <span class="keyword">new</span> ObjectOutputStream(<span class="keyword">new</span> FileOutputStream(dir));</span><br><span class="line">            opS.writeObject(data);</span><br><span class="line">            opS.close();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;).start();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 反序列化</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">recoverFromFile</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">new</span> Thread(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            File path =getExternalCacheDir();</span><br><span class="line">            File dir = <span class="keyword">new</span> File(path.getPath() + MainActivity.FILE_NAME);</span><br><span class="line">            <span class="keyword">if</span> (dir.exists())&#123;</span><br><span class="line">                ObjectInputStream ips = <span class="keyword">null</span>;</span><br><span class="line">                ips = <span class="keyword">new</span> ObjectInputStream(<span class="keyword">new</span> FileInputStream(dir));</span><br><span class="line">                login = (LoginModel) ips.readObject();</span><br><span class="line">                ips.close();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;).start();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上述代码删掉了错误异常的捕获，自行加上即可。对于 <code>LoginModel</code> 类，其实现了 <code>Serializable</code> 接口，并指定了 serialVersionUID 的值（可选），如果不指定该值可能会在之后类结构发生改变时，导致反序列化的报错。</p>
+<p>在执行完上述代码后，可以在 <code>/Android/data/包名/Cache/</code> 目录下看到 test 文件。由于涉及到 IO 的操作，所以效率会比 <code>ParcelAble</code> 接口低</p>
+<p>实现 <code>ParcelAble</code> 接口也很简单，在 AndroidStudio 中（用的是 3.5 版本），实现该接口后，能够自动补全所需要实现的模版代码。对象会被序列化至内存中，在实现之后，该对象就可以通过 Bundle，Intent，Binder 来进行传输了。</p>
+<h3 id="Binder"><a href="#Binder" class="headerlink" title="Binder"></a>Binder</h3><p>Binder 是 Android 所提供的一种跨进程通信方式，其内部的实现暂时不说，主要提及的是如何使用。</p>
+<p>Binder 的使用则是通过继承 Binder 类，重写部分方法，并实现 IIInterface 接口得到需要的 Binder。具体的继承，重写方法都是通过 AIDL 文件来自动生成。</p>
+<h4 id="AIDL"><a href="#AIDL" class="headerlink" title="AIDL"></a>AIDL</h4><h5 id="AIDL-文件定义"><a href="#AIDL-文件定义" class="headerlink" title="AIDL 文件定义"></a>AIDL 文件定义</h5><p>AIDL 文件的作用就是用于生成接口对应的 Binder 类，用于进行进程间通行，同时也能用于声明自定义的对象，使其可以在进程间进行传递。</p>
+<p>AIDL 文件定义的接口，接受以下数据类型</p>
+<p><img src="https://i.imgur.com/GY13aCs.jpg" alt="-w975"></p>
+<blockquote>
+<p>建议将 AIDL 的相关文件都放置同一包内，方便移植</p>
+</blockquote>
+<p>AIDL 文件定义</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// IBook.aidl</span></span><br><span class="line"><span class="keyword">package</span> com.koga.testretrofit.aidl;</span><br><span class="line"><span class="keyword">import</span> com.koga.testretrofit.aidl.Book;</span><br><span class="line"><span class="keyword">import</span> com.koga.testretrofit.aidl.IActivityInterface;</span><br><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">IBook</span> </span>&#123;</span><br><span class="line">     <span class="function"><span class="keyword">void</span> <span class="title">register</span><span class="params">(in IActivityInterface ian)</span></span>;</span><br><span class="line">     <span class="function"><span class="keyword">void</span> <span class="title">addBook</span><span class="params">(in Book book)</span></span>;</span><br><span class="line">     <span class="function">List&lt;Book&gt; <span class="title">getBookList</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// IActivityInterface.aidl</span></span><br><span class="line"><span class="keyword">package</span> com.koga.testretrofit.aidl;</span><br><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">IActivityInterface</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">onChange</span><span class="params">(<span class="keyword">int</span> x)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Book.aidl（需要对应的对象同名）</span></span><br><span class="line"><span class="keyword">package</span> com.koga.testretrofit.aidl;</span><br><span class="line">parcelable Book;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Book.java</span></span><br><span class="line"><span class="keyword">package</span> com.koga.testretrofit.aidl;</span><br><span class="line"><span class="keyword">import</span> android.os.Parcel;</span><br><span class="line"><span class="keyword">import</span> android.os.Parcelable;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Book</span> <span class="keyword">implements</span> <span class="title">Parcelable</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> bookId;</span><br><span class="line">    <span class="keyword">public</span> String bookName;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Book</span><span class="params">(<span class="keyword">int</span> bookId,String bookName)</span></span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.bookId = bookId;</span><br><span class="line">        <span class="keyword">this</span>.bookName = bookName;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 省略 Parcelable 的接口实现</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上述代码定义了三个 AIDL 文件，两个 AIDL 接口，一个是用于声明自定义对象为 Parcelable 类型,在编译之后，Android Studio 会自动生成接口对应的 Binder 实现 </p>
+<h5 id="AIDL-接口生成"><a href="#AIDL-接口生成" class="headerlink" title="AIDL 接口生成"></a>AIDL 接口生成</h5><p>对于定义的 AIDL 接口所生成的 Binder 实现，其结构都是一样的，具体代码如下，以 IActivityInterface 为例子</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">IActivityInterface</span> <span class="keyword">extends</span> <span class="title">android</span>.<span class="title">os</span>.<span class="title">IInterface</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">Stub</span> <span class="keyword">extends</span> <span class="title">android</span>.<span class="title">os</span>.<span class="title">Binder</span> <span class="keyword">implements</span> <span class="title">com</span>.<span class="title">koga</span>.<span class="title">testretrofit</span>.<span class="title">aidl</span>.<span class="title">IActivityInterface</span> </span>&#123;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> java.lang.String DESCRIPTOR = <span class="string">"com.koga.testretrofit.aidl.IActivityInterface"</span>;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">Stub</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.attachInterface(<span class="keyword">this</span>, DESCRIPTOR);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">static</span> com.koga.testretrofit.aidl.<span class="function">IActivityInterface <span class="title">asInterface</span><span class="params">(android.os.IBinder obj)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">if</span> ((obj == <span class="keyword">null</span>)) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            android.os.IInterface iin = obj.queryLocalInterface(DESCRIPTOR);</span><br><span class="line">            <span class="keyword">if</span> (((iin != <span class="keyword">null</span>) &amp;&amp; (iin <span class="keyword">instanceof</span> com.koga.testretrofit.aidl.IActivityInterface))) &#123;</span><br><span class="line">                <span class="keyword">return</span> ((com.koga.testretrofit.aidl.IActivityInterface) iin);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> com.koga.testretrofit.aidl.IActivityInterface.Stub.Proxy(obj);</span><br><span class="line">        &#125;</span><br><span class="line">    </span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> android.os.<span class="function">IBinder <span class="title">asBinder</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    </span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">onTransact</span><span class="params">(<span class="keyword">int</span> code, android.os.Parcel data, android.os.Parcel reply, <span class="keyword">int</span> flags)</span> <span class="keyword">throws</span> android.os.RemoteException </span>&#123;</span><br><span class="line">            java.lang.String descriptor = DESCRIPTOR;</span><br><span class="line">            <span class="keyword">switch</span> (code) &#123;</span><br><span class="line">                <span class="keyword">case</span> INTERFACE_TRANSACTION: &#123;</span><br><span class="line">                    reply.writeString(descriptor);</span><br><span class="line">                    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">case</span> TRANSACTION_onChange: &#123;</span><br><span class="line">                    data.enforceInterface(descriptor);</span><br><span class="line">                    <span class="keyword">int</span> _arg0;</span><br><span class="line">                    _arg0 = data.readInt();</span><br><span class="line">                    <span class="keyword">this</span>.onChange(_arg0);</span><br><span class="line">                    reply.writeNoException();</span><br><span class="line">                    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">default</span>: &#123;</span><br><span class="line">                    <span class="keyword">return</span> <span class="keyword">super</span>.onTransact(code, data, reply, flags);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    </span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Proxy</span> <span class="keyword">implements</span> <span class="title">com</span>.<span class="title">koga</span>.<span class="title">testretrofit</span>.<span class="title">aidl</span>.<span class="title">IActivityInterface</span> </span>&#123;</span><br><span class="line">            <span class="keyword">private</span> android.os.IBinder mRemote;</span><br><span class="line">    </span><br><span class="line">            Proxy(android.os.IBinder remote) &#123;</span><br><span class="line">                mRemote = remote;</span><br><span class="line">            &#125;</span><br><span class="line">    </span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="keyword">public</span> android.os.<span class="function">IBinder <span class="title">asBinder</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> mRemote;</span><br><span class="line">            &#125;</span><br><span class="line">    </span><br><span class="line">            <span class="keyword">public</span> java.lang.<span class="function">String <span class="title">getInterfaceDescriptor</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> DESCRIPTOR;</span><br><span class="line">            &#125;</span><br><span class="line">    </span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onChange</span><span class="params">(<span class="keyword">int</span> x)</span> <span class="keyword">throws</span> android.os.RemoteException </span>&#123;</span><br><span class="line">                android.os.Parcel _data = android.os.Parcel.obtain();</span><br><span class="line">                android.os.Parcel _reply = android.os.Parcel.obtain();</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    _data.writeInterfaceToken(DESCRIPTOR);</span><br><span class="line">                    _data.writeInt(x);</span><br><span class="line">                    mRemote.transact(Stub.TRANSACTION_onChange, _data, _reply, <span class="number">0</span>);</span><br><span class="line">                    _reply.readException();</span><br><span class="line">                &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">                    _reply.recycle();</span><br><span class="line">                    _data.recycle();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    </span><br><span class="line">        <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> TRANSACTION_onChange = (android.os.IBinder.FIRST_CALL_TRANSACTION + <span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>整体是一个继承了 android.os.IInterface 的接口，该接口只有一个方法 <code>asBinder</code>。</p>
+<p>在接口中定义了一个抽象内部类，实现了接口本身，并且继承了 Binder 类。所以接口的实现方法为</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="keyword">public</span> android.os.<span class="function">IBinder <span class="title">asBinder</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>内部类中的 <code>DESCRIPTOR</code> 是该 Binder 对象唯一标志符。</p>
+<p>在构造函数中所调用的 attachInterface 方法，该方法内部的行为如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 赋值操作</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">attachInterface</span><span class="params">(@Nullable IInterface owner, @Nullable String descriptor)</span> </span>&#123;</span><br><span class="line">    mOwner = owner;</span><br><span class="line">    mDescriptor = descriptor;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>还提供了 <code>asInterface</code> 方法，该方法就是将传入的 IBinder 转化为 IActivityInterface 本身，其中值得注意的有两点：</p>
+<p>第一个就是调用的 <code>queryLocalInterface</code> 方法，该方法在 Binder 中有实现</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="meta">@Nullable</span> <span class="function">IInterface <span class="title">queryLocalInterface</span><span class="params">(@NonNull String descriptor)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (mDescriptor != <span class="keyword">null</span> &amp;&amp; mDescriptor.equals(descriptor)) &#123;</span><br><span class="line">        <span class="keyword">return</span> mOwner;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里的 mOwner 也就是在构造函数中 <code>attachInterface</code> 所赋值的,也就是说，如果 <code>asInterface</code> 方法中传入的 IBinder 是从另一个进程序列化得到的，mDescriptor 会为空，那么就会返回 null。如果是本进程中原有的 Binder，则进入判断，如果是匹配的，则返回 mOwner。mOwner 也就是 Stub 这个抽象类本身，他继承了 IActivityInterface 这个接口。</p>
+<p>第二点要注意的就是，如果 iin 为空，那么就会返回 Stub 的内部类 Proxy，他也是继承了 IActivityInterface 的类，其内部的实现是 Binder 去调用另一进程中的方法。</p>
+<p>该抽象类重写了 Binder 的  <code>onTransact</code> 方法，正是通过该方法完成服务端方法的调用</p>
+<h5 id="AIDL-接口的实现"><a href="#AIDL-接口的实现" class="headerlink" title="AIDL 接口的实现"></a>AIDL 接口的实现</h5><p>想要使用 Android Studio 生成的 AIDL 接口，则是需要继承其内部的 Stub 抽象类</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ActivityInterfaceImpl</span> <span class="keyword">extends</span> <span class="title">IActivityInterface</span>.<span class="title">Stub</span></span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onChange</span><span class="params">(<span class="keyword">int</span> x)</span> <span class="keyword">throws</span> RemoteException </span>&#123;</span><br><span class="line">        Log.i(TAG, <span class="string">"onChange: x is "</span>+x);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其实现的方法就是最开始在 AIDL 文件中定义的方法。</p>
+<h5 id="实际例子"><a href="#实际例子" class="headerlink" title="实际例子"></a>实际例子</h5><p>AIDL 接口约定了服务端和客户端两方所能调用的方法，只有通过 AIDL 提供的接口，才能实现进程间通信，也就是说，实际上还是对方法的调用。</p>
+<p>继续以上面的三个 AIDL 文件为例，服务端实现 IBook 的接口，客户端实现 IActivityInterface 接口。</p>
+<p>服务端</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 接口实现</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">IBookImpl</span> <span class="keyword">extends</span> <span class="title">IBook</span>.<span class="title">Stub</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> List&lt;Book&gt; myBooks = <span class="keyword">new</span> ArrayList&lt;Book&gt;();</span><br><span class="line">    <span class="keyword">private</span> IActivityInterface listener;</span><br><span class="line">    <span class="keyword">private</span> String TAG = IBookImpl.class.getName();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">IBookImpl</span><span class="params">()</span></span>&#123;</span><br><span class="line">        myBooks.add(<span class="keyword">new</span> Book(<span class="number">1</span>,<span class="string">"我说"</span>));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">getPid</span><span class="params">()</span></span>&#123;</span><br><span class="line">        Log.i(TAG, <span class="string">"Impl thread is "</span> + Thread.currentThread());</span><br><span class="line">        Log.i(TAG, <span class="string">"getPid is "</span> + Process.myPid());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addBook</span><span class="params">(Book book)</span> <span class="keyword">throws</span> RemoteException </span>&#123;</span><br><span class="line">        myBooks.add(book);</span><br><span class="line">        getPid();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;Book&gt; <span class="title">getBookList</span><span class="params">()</span> <span class="keyword">throws</span> RemoteException </span>&#123;</span><br><span class="line">        getPid();</span><br><span class="line">        <span class="keyword">return</span> myBooks;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">register</span><span class="params">(IActivityInterface ian)</span> <span class="keyword">throws</span> RemoteException </span>&#123;</span><br><span class="line">        getPid();</span><br><span class="line">        <span class="keyword">this</span>.listener = ian;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> IActivityInterface <span class="title">getListener</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> listener;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Service（与 Activity 不同进程）</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyAIDLService</span> <span class="keyword">extends</span> <span class="title">Service</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> IBookImpl iBook =  <span class="keyword">new</span> IBookImpl();</span><br><span class="line">    <span class="keyword">private</span> String TAG = MyAIDLService.class.getName();</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> IBinder <span class="title">onBind</span><span class="params">(Intent intent)</span> </span>&#123;</span><br><span class="line">     <span class="keyword">new</span> Thread(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                    <span class="keyword">for</span> (Book book:iBook.getBookList()) &#123;</span><br><span class="line">                        Log.i(TAG, <span class="string">"onClick: book id is"</span> + book.bookId + <span class="string">" book name is "</span> + book.bookName);</span><br><span class="line">                    &#125;;</span><br><span class="line">                    iBook.getListener().onChange(<span class="number">5</span>);</span><br><span class="line">                    Log.i(TAG, <span class="string">"Service thread is "</span> + Thread.currentThread());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;).start();</span><br><span class="line">       <span class="keyword">return</span> (IBinder) iBook;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>先讲下服务端的代码，IBookImpl 实现了 AIDL 接口，该方法中添加了一个 <code>getPid()</code> 方法，该方法用于输出当前方法的执行线程和进程。在 Servce 的 onBind 方法中，该方法是返回一个 IBinder，这个 IBinder 会被 调用 bindService 的组件拿到。</p>
+<p>在 onBind 执行方法时，新建一个线程，遍历 iBook 中的数组，并且输出当前执行的线程。在最终的输出日志可以看出，在 IBookImpl 中的 getPid() 的输出和 onBind 中的线程是一致的，所以可以得出一个结论： <strong>服务端调用同线程的 AIDL 接口，两者的执行线程一致</strong></p>
+<p>因为线程一致，所以会出现线程堵塞的问题，需要注意是否为主线程</p>
+<p>客户端代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MainActivity</span> <span class="keyword">extends</span> <span class="title">AppCompatActivity</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String TAG = MainActivity.class.getName();</span><br><span class="line">    <span class="keyword">private</span> IBook mAIDLService;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 接口实现</span></span><br><span class="line">    <span class="keyword">private</span> IActivityInterface impl = <span class="keyword">new</span> IActivityInterface.Stub()&#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onChange</span><span class="params">(<span class="keyword">int</span> x)</span> <span class="keyword">throws</span> RemoteException </span>&#123;</span><br><span class="line">            Thread mainThread = getMainLooper().getThread();</span><br><span class="line">            Log.i(TAG, <span class="string">"Callback thread is "</span> + Thread.currentThread());</span><br><span class="line">            Log.i(TAG, <span class="string">"Connect: is main thread?"</span> + (Thread.currentThread() == mainThread));</span><br><span class="line">            Log.i(TAG, <span class="string">"onChange: x is "</span>+x);</span><br><span class="line">            startActivity(<span class="keyword">new</span> Intent(MainActivity.<span class="keyword">this</span>,SecondActivity.class));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">// Binder 死亡监听</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> IBinder.DeathRecipient mDeathRecipient = <span class="keyword">new</span> IBinder.DeathRecipient() &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">binderDied</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">if</span> (mAIDLService == <span class="keyword">null</span>)&#123;</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            mAIDLService.asBinder().unlinkToDeath(mDeathRecipient,<span class="number">0</span>);</span><br><span class="line">            mAIDLService = <span class="keyword">null</span>;</span><br><span class="line">            bindService(<span class="keyword">new</span> Intent(MainActivity.<span class="keyword">this</span>, MyAIDLService.class), mAIDLServiceConnection,<span class="number">0</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">//  AIDL 接口方式实现跨进程通信</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> ServiceConnection mAIDLServiceConnection = <span class="keyword">new</span> ServiceConnection() &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onServiceConnected</span><span class="params">(ComponentName name, IBinder service)</span> </span>&#123;</span><br><span class="line">            Thread mainThread = getMainLooper().getThread();</span><br><span class="line">            Log.i(TAG, <span class="string">"Connection thread is "</span> + Thread.currentThread());</span><br><span class="line">            mAIDLService =  IBook.Stub.asInterface(service);</span><br><span class="line">            mAIDLService.register(impl);</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                service.linkToDeath(mDeathRecipient,<span class="number">0</span>);</span><br><span class="line">            &#125;<span class="keyword">catch</span> (RemoteException e)&#123;</span><br><span class="line">                Log.i(TAG, <span class="string">"onServiceConnected: Unable to link to service death callback"</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onServiceDisconnected</span><span class="params">(ComponentName name)</span> </span>&#123;&#125;</span><br><span class="line">    &#125;;</span><br><span class="line">    </span><br><span class="line">     <span class="keyword">private</span> View.OnClickListener mListener = <span class="keyword">new</span> View.OnClickListener() &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClick</span><span class="params">(View v)</span> </span>&#123;</span><br><span class="line">            List&lt;Book&gt; list = mAIDLService.getBookList();</span><br><span class="line">            list.add(<span class="keyword">new</span> Book(<span class="number">100</span>,<span class="string">"测试100"</span>));</span><br><span class="line">            mAIDLService.addBook(<span class="keyword">new</span> Book(<span class="number">3</span>,<span class="string">"测试3"</span>));</span><br><span class="line">            <span class="keyword">for</span> (Book book:list) &#123;</span><br><span class="line">                Log.i(TAG, <span class="string">"onClick: book id is"</span> + book.bookId + <span class="string">" book name is "</span> + book.bookName);</span><br><span class="line">            &#125;;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line">        setContentView(R.layout.activity_main);</span><br><span class="line">        Button mBtn = findViewById(R.id.button);</span><br><span class="line">        mBtn.setOnClickListener(mListener);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 服务绑定</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onStart</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onStart();</span><br><span class="line">        Intent aidlServiceIntent = <span class="keyword">new</span> Intent(<span class="keyword">this</span>, MyAIDLService.class);</span><br><span class="line">        bindService(aidlServiceIntent, mAIDLServiceConnection, Context.BIND_AUTO_CREATE);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 服务解绑</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onStop</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onStop();</span><br><span class="line">        unbindService(mAIDLServiceConnection);</span><br><span class="line">    &#125;   </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在 onStart 绑定服务后，会调用到 <code>ServiceConnection</code> 中的回调接口，该回调接口的方法都是执行在 <strong>主线程</strong>中的。</p>
+<p>在服务连接后，会调用 <code>onServiceConnected</code> 方法，方法会接受到 IBinder 参数，由于服务端使用的是 AIDL 接口，所以要调用 <code>IBook.Stub.asInterface(service);</code> 来获得接口。</p>
+<p>根据之前的 AIDL 生成文件分析，这里得到的应该是 IBook.Stub.Proxy 类，所以是可以将其转化为 <code>IBook</code> 接口的。</p>
+<p>通过 <code>register</code> 的方法向服务器传递回调接口，用于服务端调用。这说明了不仅服务端可以实现 AIDL 接口，客户端也可以如此。在传递的接口执行时，因为调用方是服务端，所以其所执行的线程是 <strong>Binder 线程池的线程</strong></p>
+<p>通过调用 <code>linkToDeath</code> 方法来监听 Binder 的死亡，当其断开链接时，会调用 <code>binderDied</code> 这个方法，且该方法的线程是 <strong>Binder 线程池的线程</strong></p>
+<p>在点击事件监听的方法中，先是获取数据，然后进行添加，最后通过遍历显示。在这一方法中，需要注意的有以下几点：</p>
+<ol>
+<li>最终的输出结果不会出现 <code>onClick: book id is 3 book name is 测试3</code> 这个日志。因为我们遍历的是客户端持有的 list 变量，而在添加时，是对服务端的 list 变量进行添加，所以不会在遍历中出现；同理，如果在服务端进行 list 遍历，同样也不会出现  <code>onClick: book id is 100 book name is 测试100</code> 这个日志。</li>
+</ol>
+<ol>
+<li><code>onClick</code> 方法在主线程中执行的，而其调用服务端的方法时，可以通过 IBookImpl 中的 <code>getPid</code> 方法查看其执行线程：<strong>客户端调用服务端方法时，服务端的方法执行线程为 Binder 线程池线程</strong>。同时，在服务端方法执行过程中，onClick 执行的线程会被堵塞，所以需要注意是否为主线程在执行耗时操作。</li>
+</ol>
+<p>对于执行线程的总结如下：</p>
+<ol>
+<li>IBinder 接口的方法的执行线程取决于调用方，如果调用方和 IBinder 处于同一个进程，则线程就是调用方的线程（比如 Service）如果是远程调用，则 IBinder 的执行线程是从本进程所维护的 Binder 线程池中获取（比如 MainActivity）同时，调用方的线程会被堵塞</li>
+<li>ServiceConnection 在客户端的主线程执行，DeathRecipient 在 Binder 线程池的线程执行</li>
+<li>因为可以存在多个客户端连接服务端，所以可能会出现并发的问题，服务端需要自行解决线程同步的问题</li>
+</ol>
+<blockquote>
+<p>对于上述提到的客户端提供给服务端的接口回调： IActivityInterface，在该例子中只有一个，所以无需添加解除绑定的方法，直接在服务端赋值 null 即可。但如果服务端需要持有多个客户端的接口回调，那么需要提供 <code>unRegister</code> 方法来解除绑定。<br>由于是跨进程通信，所以服务端不能简单的使用 List 或数组来保存客户端的接口，这会导致客户端调用 <code>unRegister</code> 方法时，在服务端无法找到之前所设置的回调接口。这是因为服务端持有的接口是新生成的，并不是客户端传入的，所以无法对应起来。<br>对于出现上述的问题，需要通过 <code>RemoteCallbackList</code> 这个类来存储客户端传入的接口，其内部实现中，会通过 map 来存储数据，以 IBinder 为键值，接口实现为值来存储回调接口。这是因为在服务端和客户端中，所使用的 IBinder 是一样的。（为什么一样？）</p>
+</blockquote>
+<h4 id="Messenger"><a href="#Messenger" class="headerlink" title="Messenger"></a>Messenger</h4><p>Messenger 本质上还是 AIDL 方式实现进程间通信，在内部已经实现好了 AIDL 文件的定义以及接口的实现，并且内部使用的是 Handler，也就是说，可以理解为跨进程调用了另一方的 Handler 来发送消息。</p>
+<p>因为 Handler 本身就已经处理好线程同步的问题，所以使用 Messenger 方式实现跨进程，不需要担心并发的问题。</p>
+<h5 id="Messenger-解析"><a href="#Messenger-解析" class="headerlink" title="Messenger 解析"></a>Messenger 解析</h5><p>在使用 Messenger 时，通常使用到其两个构造函数</p>
+<ul>
+<li>Messenger（Handler）</li>
+<li>Messenger（IBinder）</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Messenger</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">Messenger</span><span class="params">(Handler target)</span> </span>&#123;</span><br><span class="line">    mTarget = target.getIMessenger();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Handler</span></span><br><span class="line"><span class="function"><span class="keyword">final</span> IMessenger <span class="title">getIMessenger</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">synchronized</span> (mQueue) &#123;</span><br><span class="line">        <span class="keyword">if</span> (mMessenger != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> mMessenger;</span><br><span class="line">        &#125;</span><br><span class="line">        mMessenger = <span class="keyword">new</span> MessengerImpl();</span><br><span class="line">        <span class="keyword">return</span> mMessenger;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">MessengerImpl</span> <span class="keyword">extends</span> <span class="title">IMessenger</span>.<span class="title">Stub</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">send</span><span class="params">(Message msg)</span> </span>&#123;</span><br><span class="line">        msg.sendingUid = Binder.getCallingUid();</span><br><span class="line">        Handler.<span class="keyword">this</span>.sendMessage(msg);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看出，最终 mTarget 对应的是 MessengerImpl 类，它是 <code>IMessenger.Stub</code> 的实现类，该类 send 方法实现就是通过 Handler 来发送消息。这个类的实现和上述提到的 AIDL 方式一样。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">Messenger</span><span class="params">(IBinder target)</span> </span>&#123;</span><br><span class="line">    mTarget = IMessenger.Stub.asInterface(target);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上述方法的使用也和自定义 AIDL 文件的方式，通过 asInterface 方法，获取到另一方实现接口的代理，所以可以看出  mTarget 就是 IMessenger.Stub.Proxy 类。</p>
+<h5 id="Messenger-使用"><a href="#Messenger-使用" class="headerlink" title="Messenger 使用"></a>Messenger 使用</h5><ol>
+<li>服务端通过 Handler 创建 Messenger</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> Handler mHandler = <span class="keyword">new</span> Handler(<span class="keyword">new</span> Handler.Callback() &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">handleMessage</span><span class="params">(Message msg)</span> </span>&#123;</span><br><span class="line">        Log.i(TAG, <span class="string">"handleMessage:1231"</span>);</span><br><span class="line">        <span class="keyword">if</span> (msg.replyTo != <span class="keyword">null</span>)&#123;</span><br><span class="line">            replyTo = msg.replyTo;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">switch</span> (msg.what) &#123;</span><br><span class="line">            <span class="keyword">case</span> <span class="number">1</span>: &#123;</span><br><span class="line">                Bundle bundle = msg.getData();</span><br><span class="line">                bundle.setClassLoader(getClassLoader());</span><br><span class="line">                LoginModel b = bundle.getParcelable(<span class="string">"test"</span>);</span><br><span class="line">                <span class="keyword">if</span> (b != <span class="keyword">null</span>) &#123;</span><br><span class="line">                    Log.i(TAG, <span class="string">"handleMessage:1231"</span> + b.getAction());</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> IBinder <span class="title">onBind</span><span class="params">(Intent intent)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> Messenger(mHandler).getBinder();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>客户端连接成功后，返回客户端的持有的 Messenger</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> Messenger mClient = <span class="keyword">new</span> Messenger(<span class="keyword">new</span> Handler(<span class="keyword">new</span> Handler.Callback() &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">handleMessage</span><span class="params">(Message msg)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span>  <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;));</span><br><span class="line"></span><br><span class="line"> <span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onServiceConnected</span><span class="params">(ComponentName name, IBinder service)</span> </span>&#123;</span><br><span class="line">    mMessngerService =  <span class="keyword">new</span> Messenger(service);</span><br><span class="line">    Bundle bundle = <span class="keyword">new</span> Bundle();</span><br><span class="line">    bundle.putParcelable(<span class="string">"test"</span>,<span class="keyword">new</span> LoginModel(<span class="string">"123"</span>));</span><br><span class="line">    Message msg = Message.obtain(<span class="keyword">null</span>,<span class="number">1</span>);</span><br><span class="line">    msg.setData(bundle);</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        msg.replyTo = mClient;</span><br><span class="line">        mMessngerService.send(msg);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (RemoteException e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上述代码，客户端和服务端互相交换了 Messenger，之后可以通过 Send 发送消息来实现跨进程通信。</p>
+<p>需要注意的是，在客户端发送消息时，是通过 Bundle 来发送自定义的数据，并且通过 setData 的方式来设置 Bundle。（而不是使用 Message 的 object 变量 ）这是因为在 Message 序列化的过程中，会对数据进行验证，只有官方定义并且实现了 Parcelable 接口的类才能够进行传输，比如说 Bundle。（不知道为什么一定要是官方的，自定义不行？）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Message</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">writeToParcel</span><span class="params">(Parcel dest, <span class="keyword">int</span> flags)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (callback != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(</span><br><span class="line">            <span class="string">"Can't marshal callbacks across processes."</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    dest.writeInt(what);</span><br><span class="line">    dest.writeInt(arg1);</span><br><span class="line">    dest.writeInt(arg2);</span><br><span class="line">    <span class="keyword">if</span> (obj != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            Parcelable p = (Parcelable)obj;</span><br><span class="line">            dest.writeInt(<span class="number">1</span>);</span><br><span class="line">            dest.writeParcelable(p, flags);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (ClassCastException e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(</span><br><span class="line">                <span class="string">"Can't marshal non-Parcelable objects across processes."</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        dest.writeInt(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    dest.writeLong(when);</span><br><span class="line">    dest.writeBundle(data);</span><br><span class="line">    Messenger.writeMessengerOrNullToParcel(replyTo, dest);</span><br><span class="line">    dest.writeInt(sendingUid);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">readFromParcel</span><span class="params">(Parcel source)</span> </span>&#123;</span><br><span class="line">    what = source.readInt();</span><br><span class="line">    arg1 = source.readInt();</span><br><span class="line">    arg2 = source.readInt();</span><br><span class="line">    <span class="keyword">if</span> (source.readInt() != <span class="number">0</span>) &#123;</span><br><span class="line">        obj = source.readParcelable(getClass().getClassLoader());</span><br><span class="line">    &#125;</span><br><span class="line">    when = source.readLong();</span><br><span class="line">    data = source.readBundle();</span><br><span class="line">    replyTo = Messenger.readMessengerOrNullFromParcel(source);</span><br><span class="line">    sendingUid = source.readInt();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上述的是 Message 对 Parcelable 接口的方法实现，可以看出， Message 不能够设置 callback，否则会报错，不需要设置 Handler，因为不会被传递到另一端，而对于 obj 变量，则需要实现 Parcelable 接口。</p>
+<p>回到服务端对消息的处理过程，在这一过程中，取出 Bundle 后，需要设置 classLoader，否则会在取出 Bundle 中的数据时报错 <code>Class Not Found</code>。</p>
+<h3 id="todo"><a href="#todo" class="headerlink" title="todo"></a>todo</h3><p>ContentProvider，BroadCast，Socket 也可以进行多进程的通信</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p><img src="https://i.imgur.com/UU2Kp3U.jpg" alt="-w1089"></p>
+<h3 id="Todo"><a href="#Todo" class="headerlink" title="Todo"></a>Todo</h3><ol>
+<li>Bundle 不设置 ClassLoader 时，为什么会报错</li>
+</ol>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p>Android 开发艺术探索</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/学习笔记/" rel="tag"># 学习笔记</a>
+          
+            <a href="/tags/未完善/" rel="tag"># 未完善</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/12/23/AndroidHandler/" rel="next" title="Android Handler">
+                <i class="fa fa-chevron-left"></i> Android Handler
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/12/23/Android-Retrofit-1/" rel="prev" title="Android Retrofit 学习（一）">
+                Android Retrofit 学习（一） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Koga Leung</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#序列化"><span class="nav-number">1.</span> <span class="nav-text">序列化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Binder"><span class="nav-number">2.</span> <span class="nav-text">Binder</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#AIDL"><span class="nav-number">2.1.</span> <span class="nav-text">AIDL</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#AIDL-文件定义"><span class="nav-number">2.1.1.</span> <span class="nav-text">AIDL 文件定义</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#AIDL-接口生成"><span class="nav-number">2.1.2.</span> <span class="nav-text">AIDL 接口生成</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#AIDL-接口的实现"><span class="nav-number">2.1.3.</span> <span class="nav-text">AIDL 接口的实现</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#实际例子"><span class="nav-number">2.1.4.</span> <span class="nav-text">实际例子</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Messenger"><span class="nav-number">2.2.</span> <span class="nav-text">Messenger</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Messenger-解析"><span class="nav-number">2.2.1.</span> <span class="nav-text">Messenger 解析</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Messenger-使用"><span class="nav-number">2.2.2.</span> <span class="nav-text">Messenger 使用</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#todo"><span class="nav-number">3.</span> <span class="nav-text">todo</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Todo"><span class="nav-number">5.</span> <span class="nav-text">Todo</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考"><span class="nav-number">6.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Koga Leung</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="学习笔记,源码学习,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="这篇文章主要讲解的是 Retrofit 是如何将 API 接口方法中的注解解析成所需要的请求参数和请求方法  ServiceMethod 的 parseAnnotations方法中存在如下代码 1RequestFactory requestFactory = RequestFactory.parseAnnotations(retrofit, method);  继续查看 parseAnnotati">
+<meta name="keywords" content="学习笔记,源码学习">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android Retrofit 学习（三）">
+<meta property="og:url" content="http://yoursite.com/2019/12/23/Android-Retrofit-3/index.html">
+<meta property="og:site_name" content="Koga">
+<meta property="og:description" content="这篇文章主要讲解的是 Retrofit 是如何将 API 接口方法中的注解解析成所需要的请求参数和请求方法  ServiceMethod 的 parseAnnotations方法中存在如下代码 1RequestFactory requestFactory = RequestFactory.parseAnnotations(retrofit, method);  继续查看 parseAnnotati">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-12-23T01:49:41.299Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android Retrofit 学习（三）">
+<meta name="twitter:description" content="这篇文章主要讲解的是 Retrofit 是如何将 API 接口方法中的注解解析成所需要的请求参数和请求方法  ServiceMethod 的 parseAnnotations方法中存在如下代码 1RequestFactory requestFactory = RequestFactory.parseAnnotations(retrofit, method);  继续查看 parseAnnotati">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/12/23/Android-Retrofit-3/">
+
+
+
+
+
+  <title>Android Retrofit 学习（三） | Koga</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Koga</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/12/23/Android-Retrofit-3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Koga Leung">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Koga">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Android Retrofit 学习（三）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-23T09:48:46+08:00">
+                2019-12-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>这篇文章主要讲解的是 Retrofit 是如何将 API 接口方法中的注解解析成所需要的请求参数和请求方法</p>
+<p> <code>ServiceMethod</code> 的 <code>parseAnnotations</code>方法中存在如下代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">RequestFactory requestFactory = RequestFactory.parseAnnotations(retrofit, method);</span><br></pre></td></tr></table></figure>
+
+<p>继续查看 <code>parseAnnotations</code> 的方法，传入的参数是 Retrofit 实例和 method，这里的 method 就是 API 接口中被调用的方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> RequestFactory <span class="title">parseAnnotations</span><span class="params">(Retrofit retrofit, Method method)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> Builder(retrofit, method).build();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Builder(Retrofit retrofit, Method method) &#123;</span><br><span class="line">  <span class="keyword">this</span>.retrofit = retrofit;</span><br><span class="line">  <span class="keyword">this</span>.method = method;</span><br><span class="line">  <span class="keyword">this</span>.methodAnnotations = method.getAnnotations();</span><br><span class="line">  <span class="keyword">this</span>.parameterTypes = method.getGenericParameterTypes();</span><br><span class="line">  <span class="keyword">this</span>.parameterAnnotationsArray = method.getParameterAnnotations();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>该方法内部直接创建了一个 Builder 类，并调用了它的 build 方法，可以在构造函数中看出，它将方法中的注解分为两类，一类是方法的注解，一类是参数的注解，并且还获得了每个参数的类型。而且 <code>parameterAnnotationsArray</code> 是一个二维数组，对应着每一位参数</p>
+<p>接着查看 build 的方法，该方法的代码流程过多，所以拆分成一段段分析</p>
+<h3 id="解析方法注解"><a href="#解析方法注解" class="headerlink" title="解析方法注解"></a>解析方法注解</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// build 方法</span></span><br><span class="line"><span class="keyword">for</span> (Annotation annotation : methodAnnotations) &#123;</span><br><span class="line">    parseMethodAnnotation(annotation);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>build 方法的第一步就是直接遍历注解，并将其传入 <code>parseMethodAnnotation</code> 方法中。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">parseMethodAnnotation</span><span class="params">(Annotation annotation)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (annotation <span class="keyword">instanceof</span> DELETE) &#123;</span><br><span class="line">    parseHttpMethodAndPath(<span class="string">"DELETE"</span>, ((DELETE) annotation).value(), <span class="keyword">false</span>);</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (annotation <span class="keyword">instanceof</span> GET) &#123;</span><br><span class="line">    parseHttpMethodAndPath(<span class="string">"GET"</span>, ((GET) annotation).value(), <span class="keyword">false</span>);</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (annotation <span class="keyword">instanceof</span> HEAD) &#123;</span><br><span class="line">    parseHttpMethodAndPath(<span class="string">"HEAD"</span>, ((HEAD) annotation).value(), <span class="keyword">false</span>);</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (annotation <span class="keyword">instanceof</span> PATCH) &#123;</span><br><span class="line">    parseHttpMethodAndPath(<span class="string">"PATCH"</span>, ((PATCH) annotation).value(), <span class="keyword">true</span>);</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (annotation <span class="keyword">instanceof</span> POST) &#123;</span><br><span class="line">    parseHttpMethodAndPath(<span class="string">"POST"</span>, ((POST) annotation).value(), <span class="keyword">true</span>);</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (annotation <span class="keyword">instanceof</span> PUT) &#123;</span><br><span class="line">    parseHttpMethodAndPath(<span class="string">"PUT"</span>, ((PUT) annotation).value(), <span class="keyword">true</span>);</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (annotation <span class="keyword">instanceof</span> OPTIONS) &#123;</span><br><span class="line">    parseHttpMethodAndPath(<span class="string">"OPTIONS"</span>, ((OPTIONS) annotation).value(), <span class="keyword">false</span>);</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (annotation <span class="keyword">instanceof</span> HTTP) &#123;</span><br><span class="line">    HTTP http = (HTTP) annotation;</span><br><span class="line">    parseHttpMethodAndPath(http.method(), http.path(), http.hasBody());</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (annotation <span class="keyword">instanceof</span> retrofit2.http.Headers) &#123;</span><br><span class="line">    String[] headersToParse = ((retrofit2.http.Headers) annotation).value();</span><br><span class="line">    <span class="keyword">if</span> (headersToParse.length == <span class="number">0</span>) &#123;</span><br><span class="line">      <span class="keyword">throw</span> methodError(method, <span class="string">"@Headers annotation is empty."</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    headers = parseHeaders(headersToParse);</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (annotation <span class="keyword">instanceof</span> Multipart) &#123;</span><br><span class="line">    isMultipart = <span class="keyword">true</span>;</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (annotation <span class="keyword">instanceof</span> FormUrlEncoded) &#123;</span><br><span class="line">    isFormEncoded = <span class="keyword">true</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>该方法内部就是判断注解属于哪个类型，然后将其对应的方法字符串，url 以及是否有 body 这三个参数传入 <code>parseHttpMethodAndPath</code> 方法中。</p>
+<blockquote>
+<p>需要注意的是，这里的 Delete 方法，它的第三个参数为 false，也就是不允许有 body，所以如果出现需要 body 的情况，可以选择直接使用 Http 注解来完成</p>
+</blockquote>
+<p>除了对请求方法进行解析外，还会根据是否存在 Multipart 和 FormUrlEncoded 对变量进行赋值。</p>
+<p><code>parseHttpMethodAndPath</code> 方法如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">parseHttpMethodAndPath</span><span class="params">(String httpMethod, String value, <span class="keyword">boolean</span> hasBody)</span> </span>&#123;</span><br><span class="line">     <span class="keyword">this</span>.httpMethod = httpMethod;</span><br><span class="line">     <span class="keyword">this</span>.hasBody = hasBody;</span><br><span class="line">     <span class="keyword">if</span> (value.isEmpty()) &#123;</span><br><span class="line">       <span class="keyword">return</span>;</span><br><span class="line">     &#125;</span><br><span class="line">     <span class="keyword">int</span> question = value.indexOf(<span class="string">'?'</span>);</span><br><span class="line">     <span class="keyword">if</span> (question != -<span class="number">1</span> &amp;&amp; question &lt; value.length() - <span class="number">1</span>) &#123;</span><br><span class="line">       String queryParams = value.substring(question + <span class="number">1</span>);</span><br><span class="line">       Matcher queryParamMatcher = PARAM_URL_REGEX.matcher(queryParams);</span><br><span class="line">     &#125;</span><br><span class="line"></span><br><span class="line">     <span class="keyword">this</span>.relativeUrl = value;</span><br><span class="line">     <span class="keyword">this</span>.relativeUrlParamNames = parsePathParameters(value);</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+
+<p>该方法主要就是将请求的相关数据存入变量中，包括请求方法，请求 body，请求相对地址，请求地址参数</p>
+<h3 id="解析参数注解"><a href="#解析参数注解" class="headerlink" title="解析参数注解"></a>解析参数注解</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// build 方法</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> parameterCount = parameterAnnotationsArray.length;</span><br><span class="line">parameterHandlers = <span class="keyword">new</span> ParameterHandler&lt;?&gt;[parameterCount];</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> p = <span class="number">0</span>; p &lt; parameterCount; p++) &#123;</span><br><span class="line">    parameterHandlers[p] = parseParameter(p, parameterTypes[p], parameterAnnotationsArray[p]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里将每一位参数和其注解都传入了 <code>parseParameter</code> 方法中进行处理，代码如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"> <span class="keyword">private</span> ParameterHandler&lt;?&gt; parseParameter(</span><br><span class="line">    <span class="keyword">int</span> p, Type parameterType, <span class="meta">@Nullable</span> Annotation[] annotations) &#123;</span><br><span class="line">    ParameterHandler&lt;?&gt; result = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">for</span> (Annotation annotation : annotations) &#123;</span><br><span class="line">      ParameterHandler&lt;?&gt; annotationAction =</span><br><span class="line">          parseParameterAnnotation(p, parameterType, annotations, annotation);    </span><br><span class="line">      <span class="keyword">if</span> (annotationAction == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">continue</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      result = annotationAction;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>该方法内部就是在遍历参数上的每一个注解，并且调用 <code>parseParameterAnnotation</code> 方法来得到 <code>ParameterHandler</code> 类，由于该方法内部对每一个注解的有其自己的处理流程，代码过长，所以不全部进行分析了，只需要知道这个方法会根据注解返回其对应的 ParameterHandler 子类。下面只分析 @Body 注解的情况</p>
+<h4 id="body-注解"><a href="#body-注解" class="headerlink" title="body 注解"></a>body 注解</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">else</span> <span class="keyword">if</span> (annotation <span class="keyword">instanceof</span> Body) &#123;</span><br><span class="line">    validateResolvableType(p, type);</span><br><span class="line">    Converter&lt;?, RequestBody&gt; converter;</span><br><span class="line">   <span class="keyword">try</span> &#123;</span><br><span class="line">      converter = retrofit.requestBodyConverter(type, annotations, methodAnnotations);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (RuntimeException e) &#123;</span><br><span class="line">      <span class="comment">// Wide exception range because factories are user code.</span></span><br><span class="line">      <span class="keyword">throw</span> parameterError(method, e, p, <span class="string">"Unable to create @Body converter for %s"</span>, type);</span><br><span class="line">    &#125;</span><br><span class="line">    gotBody = <span class="keyword">true</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> ParameterHandler.Body&lt;&gt;(converter);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里会使用到 Converter ，是为了对 body 参数的数据进行转换。 通过 retrofit 的 <code>requestBodyConverter</code> 方法来获得 Converter</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> start = converterFactories.indexOf(skipPast) + <span class="number">1</span>;</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = start, count = converterFactories.size(); i &lt; count; i++) &#123;</span><br><span class="line">  Converter.Factory factory = converterFactories.get(i);</span><br><span class="line">  Converter&lt;?, RequestBody&gt; converter =</span><br><span class="line">      factory.requestBodyConverter(type, parameterAnnotations, methodAnnotations, <span class="keyword">this</span>);</span><br><span class="line">  <span class="keyword">if</span> (converter != <span class="keyword">null</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> (Converter&lt;T, RequestBody&gt;) converter;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其代码和上一篇中指定接受数据类型的转换器的类似，都是通过遍历数组，找到能够解析的转换器并返回。</p>
+<h5 id="Body-注解的坑"><a href="#Body-注解的坑" class="headerlink" title="Body 注解的坑"></a>Body 注解的坑</h5><p>如果直接使用 @Body 注解来进行请求，例如如下 API 接口</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">// API 接口</span></span><br><span class="line"><span class="function">Call&lt;ResponseBody&gt; <span class="title">login</span><span class="params">(@Body LoginModel model)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// body</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LoginModel</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> String username;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">LoginModel</span><span class="params">(String username)</span></span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.username = username;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// retrofit 实例</span></span><br><span class="line">Retrofit.Builder().baseUrl(<span class="string">"test"</span>).build()</span><br></pre></td></tr></table></figure>
+
+<p>这样子的写法是会报错的，<code>Unable to create @Body converter for class LoginModel</code>。这是因为在创建 Retrofit 实例时，没有制定特定的转换器，所以会去使用默认的转换器 <code>BuiltlnConverters</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span> <span class="keyword">public</span> <span class="meta">@Nullable</span> Converter&lt;?, RequestBody&gt; requestBodyConverter(Type type,</span><br><span class="line">  Annotation[] parameterAnnotations, Annotation[] methodAnnotations, Retrofit retrofit) &#123;</span><br><span class="line"><span class="keyword">if</span> (RequestBody.class.isAssignableFrom(Utils.getRawType(type))) &#123;</span><br><span class="line">  <span class="keyword">return</span> RequestBodyConverter.INSTANCE;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>因为默认的 converter 只处理 ResponseBody 类型的数据，所以在在指定非 ResponseBody 数据时，会返回 null，所以导致最终没有结果而抛出错误。</p>
+<p>所以解决办法就是在创建 Retrofit 实例时，通过 <code>addConverterFactory</code> 添加特定的转换器，比如 Gson，这样就可以解决这个问题了。</p>
+<blockquote>
+<p>官方文档对这个问题也有提到： By default, Retrofit can only deserialize HTTP bodies into OkHttp’s ResponseBody type and it can only accept its RequestBody type for @Body.</p>
+</blockquote>
+<h3 id="RequestFactory-的创建"><a href="#RequestFactory-的创建" class="headerlink" title="RequestFactory 的创建"></a>RequestFactory 的创建</h3><p>在处理好参数和方法的注解后，直接调用该方法创建 RetrofitFactory </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">return</span> <span class="keyword">new</span> RequestFactory(<span class="keyword">this</span>);</span><br></pre></td></tr></table></figure>
+
+<p>这样，这里返回的 RequestFactory 就会被传入到 HttpServiceMethod 中了</p>
+<h3 id="发起网络请求"><a href="#发起网络请求" class="headerlink" title="发起网络请求"></a>发起网络请求</h3><p>只有在网络请求真正发起的时候，才会调用到 RequestFactory 来生成 Request 参数.也就是在 OkHttpCall 调用了 enqueue 方法后，调用到 createRawCall() 方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> okhttp3.<span class="function">Call <span class="title">createRawCall</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    okhttp3.Call call = callFactory.newCall(requestFactory.create(args));</span><br><span class="line">    <span class="keyword">return</span> call;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里调用了 <code>requestFactory.create</code> 方法，返回的是一个 Request 类</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">okhttp3.<span class="function">Request <span class="title">create</span><span class="params">(Object[] args)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    <span class="comment">// 1</span></span><br><span class="line">    ParameterHandler&lt;Object&gt;[] handlers = (ParameterHandler&lt;Object&gt;[]) parameterHandlers;</span><br><span class="line">    <span class="keyword">int</span> argumentCount = args.length;</span><br><span class="line">    <span class="comment">// 2</span></span><br><span class="line">    RequestBuilder requestBuilder = <span class="keyword">new</span> RequestBuilder(httpMethod, baseUrl, relativeUrl,</span><br><span class="line">        headers, contentType, hasBody, isFormEncoded, isMultipart);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 3</span></span><br><span class="line">    List&lt;Object&gt; argumentList = <span class="keyword">new</span> ArrayList&lt;&gt;(argumentCount);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> p = <span class="number">0</span>; p &lt; argumentCount; p++) &#123;</span><br><span class="line">      argumentList.add(args[p]);</span><br><span class="line">      handlers[p].apply(requestBuilder, args[p]);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 4</span></span><br><span class="line">    <span class="keyword">return</span> requestBuilder.get()</span><br><span class="line">        .tag(Invocation.class, <span class="keyword">new</span> Invocation(method, argumentList))</span><br><span class="line">        .build();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>该方法的第一步是获取参数的数量，第二步则是根据之前设定好的变量来创建 RequestBuilder 类。</p>
+<p>在第三步中，获取 <code>parameterHandlers</code> 中的数据，调用其 <code>apply</code> 方法，传入的参数就是 RequestBuilder 和对应位置的参数。</p>
+<p>该方法的意义在于，通过不同的 parameterHandlers，来调用 RequestBuilder 中的不同方法，将 arg 参数设置到 Request 中。每一种注解的处理方式都不相同，这里以 @Query 注解的参数为例子</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// API 接口</span></span><br><span class="line"><span class="meta">@GET</span>(<span class="string">"Test"</span>)</span><br><span class="line"><span class="function">Single&lt;TestResult&gt; <span class="title">login</span><span class="params">(@Query(<span class="string">"username)String username);</span></span></span></span><br></pre></td></tr></table></figure>
+
+<p>那么会调用到 Query 注解对应的 parameterHandler，它的 apply 方法如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">Query</span>&lt;<span class="title">T</span>&gt; <span class="keyword">extends</span> <span class="title">ParameterHandler</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> String name;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Converter&lt;T, String&gt; valueConverter;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">boolean</span> encoded;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span> <span class="function"><span class="keyword">void</span> <span class="title">apply</span><span class="params">(RequestBuilder builder, @Nullable T value)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">      String queryValue = valueConverter.convert(value);</span><br><span class="line">      builder.addQueryParam(name, queryValue, encoded);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里的 valueConverter 使用的是 ToStringConverter，它的方法如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">return</span> value.toString();</span><br></pre></td></tr></table></figure>
+
+<p>所以通过这种方式，就能够将参数传入到 RequestBuilder 中,最终在 build 方法后，得到的 Request 类就包含了改次请求的所有数据了。可以直接被 okHttp 所使用</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/学习笔记/" rel="tag"># 学习笔记</a>
+          
+            <a href="/tags/源码学习/" rel="tag"># 源码学习</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/12/23/Android-Retrofit-2/" rel="next" title="Android Retrofit 学习（二）">
+                <i class="fa fa-chevron-left"></i> Android Retrofit 学习（二）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/12/23/Android-Retrofit-4/" rel="prev" title="Android Retrofit 学习（四）">
+                Android Retrofit 学习（四） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Koga Leung</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#解析方法注解"><span class="nav-number">1.</span> <span class="nav-text">解析方法注解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解析参数注解"><span class="nav-number">2.</span> <span class="nav-text">解析参数注解</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#body-注解"><span class="nav-number">2.1.</span> <span class="nav-text">body 注解</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Body-注解的坑"><span class="nav-number">2.1.1.</span> <span class="nav-text">Body 注解的坑</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RequestFactory-的创建"><span class="nav-number">3.</span> <span class="nav-text">RequestFactory 的创建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#发起网络请求"><span class="nav-number">4.</span> <span class="nav-text">发起网络请求</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Koga Leung</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

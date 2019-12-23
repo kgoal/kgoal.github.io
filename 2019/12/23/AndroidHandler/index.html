@@ -87,14 +87,14 @@
 <meta property="og:site_name" content="Koga">
 <meta property="og:description" content="Handler 是 Android 消息机制的实现。可以简单的通过 Handler 来实现线程的切换，常被用来在子线程中更新主线程 UI。 Handler 的功能实现主要依赖到 Message，MessageQueue 以及 Looper 类。 简单使用主线程处理子线程消息在子线程更新主线程 UI 时，就常使用该种方式来完成 123456789101112131415161718192021222">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://yoursite.com/2019/12/23/AndroidHandler/media/15752535743601/15755310777493.jpg">
-<meta property="og:image" content="http://yoursite.com/2019/12/23/AndroidHandler/media/15752535743601/15755312532964.jpg">
-<meta property="og:image" content="http://yoursite.com/2019/12/23/AndroidHandler/media/15752535743601/15755314285200.jpg">
-<meta property="og:updated_time" content="2019-12-23T01:26:06.043Z">
+<meta property="og:image" content="https://i.imgur.com/bMxdMcG.jpg">
+<meta property="og:image" content="https://i.imgur.com/yv6CPoW.jpg">
+<meta property="og:image" content="https://i.imgur.com/FIzos7P.jpg">
+<meta property="og:updated_time" content="2019-12-23T01:34:55.900Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Android Handler">
 <meta name="twitter:description" content="Handler 是 Android 消息机制的实现。可以简单的通过 Handler 来实现线程的切换，常被用来在子线程中更新主线程 UI。 Handler 的功能实现主要依赖到 Message，MessageQueue 以及 Looper 类。 简单使用主线程处理子线程消息在子线程更新主线程 UI 时，就常使用该种方式来完成 123456789101112131415161718192021222">
-<meta name="twitter:image" content="http://yoursite.com/2019/12/23/AndroidHandler/media/15752535743601/15755310777493.jpg">
+<meta name="twitter:image" content="https://i.imgur.com/bMxdMcG.jpg">
 
 
 
@@ -567,19 +567,19 @@
 <p>否则的话，则会遍历消息队列，其执行的逻辑如注释所示。可以看出，该方法会保留在当前时间点前的消息，这些消息会在线程唤醒后被处理。</p>
 <h4 id="问题-1"><a href="#问题-1" class="headerlink" title="问题"></a>问题</h4><p>如果保留下来的消息中，消息队列的首位就是同步障碍消息，那么在 next 方法中，不会对后续同步消息进行处理。并且会在消息没有全部处理完成前，就直接退出 Looper。这要怎么处理呢？消息就会一直留存在了。</p>
 <h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>从消息发送到处理的整体流程如上所示，以下是具体流程图解析</p>
-<p><img src="media/15752535743601/15755310777493.jpg" alt></p>
+<p><img src="https://i.imgur.com/bMxdMcG.jpg" alt="Imgur"></p>
 <p>流程图中可以看出，可以存在多个 Handler，但是一个线程中只能有一个 Looper 和 MessageQueue。<br>图中的 Handler 分别发送不同类型的消息进入消息队列（障碍同步消息是用 MessageQueue 自身发出的），假若此时的消息队列如图所示，在 Looper 的 loop 方法作用下，那么其消息的处理流程如下：</p>
 <ol>
 <li>取出同步非延时消息，交由 Handler1 处理</li>
 <li>遇到障碍同步消息，开始遍历消息队列中的异步消息并处理，此时会将异步消息交由 Handler3 进行处理</li>
 </ol>
 <p>此时消息队列如下所示</p>
-<p><img src="media/15752535743601/15755312532964.jpg" alt></p>
+<p><img src="https://i.imgur.com/yv6CPoW.jpg" alt="Imgur"></p>
 <ol>
 <li>在处理完上述异步消息后，由于障碍同步消息仍然存在，所以继续遍历消息队列中的异步消息，在获取到异步延时消息时，由于时间未满足，此时会对消息队列进行堵塞，知道时间满足。</li>
 <li>在此过程中，假若调用了 <code>removeSyncBarrier</code> 方法，那么此时的消息队列状态如下，并且此时消息队列被唤醒，不再堵塞</li>
 </ol>
-<p><img src="media/15752535743601/15755314285200.jpg" alt></p>
+<p><img src="https://i.imgur.com/FIzos7P.jpg" alt="Imgur"></p>
 <ol>
 <li>被唤醒后的消息队列开始继续获取消息，此时能够获取到同步延时消息，并且时间也满足，则会交由 Handler2 进行处理</li>
 <li>在同步延时消息处理完成后，如果异步延时消息时间也满足，则会将其交由 Handler3 进行处理，否则则是堵塞队列，知道时间满足</li>
@@ -657,6 +657,10 @@
 
           <div class="post-nav-prev post-nav-item">
             
+              <a href="/2019/12/23/Android多进程/" rel="prev" title="Android 多进程">
+                Android 多进程 <i class="fa fa-chevron-right"></i>
+              </a>
+            
           </div>
         </div>
       
@@ -732,7 +736,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-count">11</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
